@@ -1,0 +1,8 @@
+version: '3.1'
+
+stories:
+  - story: Navigate to next slide
+    steps:
+      - intent: next_slide
+      - action: utter_next_slide
+  

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Slides por Voz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #4CAF50;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        #status {
+            margin-top: 20px;
+            padding: 10px;
+            border: 2px solid #2196F3;
+            background-color: #fff;
+            color: #2196F3;
+            display: inline-block;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Controle de Slides por Voz</h1>
+    <p>Diga "Próximo slide" ou "Slide anterior" para controlar a apresentação.</p>
+    <div id="status">Iniciando reconhecimento de voz...</div>
+
+    <script>
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'pt-PT';
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
+        const statusDiv = document.getElementById('status');
+
+        recognition.onstart = () => {
+            console.log('Reconhecimento de voz iniciado.');
+            statusDiv.textContent = 'Escutando comandos...';
+        };
+
+        recognition.onresult = async (event) => {
+            const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+            console.log(`Comando reconhecido: ${command}`);
+            statusDiv.textContent = `Comando reconhecido: ${command}`;
+
+            let intent = '';
+            if (command.includes('próximo slide') || command.includes('próximo')) {
+                intent = 'next_slide';
+            } else if (command.includes('slide anterior') || command.includes('anterior')) {
+                intent = 'previous_slide';
+            }
+
+            if (intent) {
+                try {
+                    const response = await fetch('http://localhost:5000/api/voice-command/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ Intent: intent })
+                    });
+
+                    if (response.ok) {
+                        const responseText = await response.text();
+                        console.log(`Servidor respondeu: ${responseText}`);
+                        statusDiv.textContent = `Comando enviado: ${intent}. Resposta do servidor: ${responseText}`;
+                    } else {
+                        console.error(`Erro do servidor: ${response.status}`);
+                        statusDiv.textContent = `Erro do servidor: ${response.status}`;
+                    }
+                } catch (error) {
+                    console.error('Erro ao se comunicar com o backend:', error);
+                    statusDiv.textContent = 'Erro ao se comunicar com o backend.';
+                }
+            } else {
+                console.log('Comando não reconhecido.');
+                statusDiv.textContent = 'Comando não reconhecido.';
+            }
+        };
+
+
+        recognition.onerror = (event) => {
+            console.error('Erro no reconhecimento de voz:', event.error);
+            statusDiv.textContent = `Erro no reconhecimento de voz: ${event.error}`;
+        };
+
+        recognition.onend = () => {
+            console.log('Reconhecimento de voz finalizado. Reiniciando...');
+            statusDiv.textContent = 'Reconhecimento de voz finalizado. Reiniciando...';
+            recognition.start(); // Always listening
+        };
+
+        recognition.start(); // Start listening for commands
+    </script>
+</body>
+</html>

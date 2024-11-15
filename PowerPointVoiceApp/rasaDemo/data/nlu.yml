@@ -1,0 +1,18 @@
+version: "3.1"
+
+nlu:
+  - intent: next_slide
+    examples: |
+      - Próximo slide
+      - Avançar slide
+      - Vai para o próximo
+      - Passa para o próximo slide
+      - Próximo
+
+  - intent: previous_slide
+    examples: |
+      - Slide anterior
+      - Voltar para o slide anterior
+      - Vai para trás
+      - Voltar slide
+      - Retrocede para o slide anterior

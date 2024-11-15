@@ -1,0 +1,12 @@
+version: '3.1'
+
+rules:
+- rule: Respond to next slide
+  steps:
+  - intent: next_slide
+  - action: utter_next_slide
+
+- rule: Respond to previous slide
+  steps:
+  - intent: previous_slide
+  - action: utter_previous_slide

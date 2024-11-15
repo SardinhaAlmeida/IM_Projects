@@ -3,7 +3,10 @@ version: "3.1"
 nlu:
   - intent: next_slide
     examples: |
-      - Próximo slide
+      - Próximo slide, por favor
+      - Avançando para o próximo slide
+      - Estou farta deste slide passa para o próximo
+      - Já terminei este 
       - Avançar slide
       - Vai para o próximo
       - Passa para o próximo slide
@@ -12,6 +15,7 @@ nlu:
   - intent: previous_slide
     examples: |
       - Slide anterior
+      - Esqueci-me de dizer uma coisa no slide anterior
       - Voltar para o slide anterior
       - Vai para trás
       - Voltar slide

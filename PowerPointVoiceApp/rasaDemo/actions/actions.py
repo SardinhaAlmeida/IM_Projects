@@ -42,6 +42,7 @@ class ActionPreviousSlide(Action):
             dispatcher.utter_message(text=f"Erro ao voltar para o slide anterior: {e}")
         return []
 
+
 class ActionDebugVoice(Action):
     def name(self) -> str:
         return "action_debug_voice"

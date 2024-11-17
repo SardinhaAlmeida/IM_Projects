@@ -96,7 +96,7 @@
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
-        recognition.interimResults = true;
+        recognition.interimResults = false;
         recognition.lang = 'pt-PT';
 
         const statusDiv = document.getElementById('status');
@@ -114,10 +114,21 @@
 
         };
 
+        let cooldown = false;
+
         recognition.onresult = async (event) => {
+
+            if (isSpeaking || cooldown) {
+                log('Ignorando comando devido ao cooldown ou fala em andamento.');
+                return;
+            }
+
             const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-            console.log(`Comando reconhecido: ${command}`);
+            log(`Comando reconhecido: ${command}`);
             statusDiv.textContent = `Comando reconhecido: ${command}`;
+
+            cooldown = true;
+            setTimeout(() => cooldown = false, 3000);
 
             try {
                 const response = await fetch('http://localhost:5005/model/parse', {
@@ -132,7 +143,11 @@
                     const confidence = data.intent.confidence;
                     log(`Intent: ${intent}, Confiança: ${confidence}`);
 
-                    if (confidence >= 0.7) {
+                    if (intent === 'fallback' || confidence < 0.6) {
+                        responseDiv.textContent = 'Comando não reconhecido. Tente novamente.';
+                        speak('Desculpe, não percebi o que disse. Pode repetir?');
+                        log('Fallback acionado.');
+                    } else {
                         switch (intent) {
                             case 'next_slide':
                                 sendVoiceCommand('next_slide', 'Passando para o próximo slide.');
@@ -145,19 +160,17 @@
                                 log('Intent não reconhecida.');
                                 break;
                         }
-                    } else {
-                        responseDiv.textContent = 'Confiança baixa no comando reconhecido.';
-                        log('Confiança insuficiente.');
                     }
                 } else {
                     responseDiv.textContent = 'Erro ao processar o comando.';
-                    log('Erro ao processar comando no servidor RASA.');
+                    log('Erro no servidor RASA.');
                 }
             } catch (error) {
                 log(`Erro na comunicação com o RASA: ${error}`);
                 responseDiv.textContent = 'Erro na comunicação com o servidor.';
             }
         };
+
 
         function sendVoiceCommand(intent, feedback) {
             fetch('http://localhost:5000/api/voice-command/', {
@@ -173,11 +186,17 @@
             });
         }
 
+        let isSpeaking = false;
+
         function speak(text) {
             if ('speechSynthesis' in window) {
-                const msg = new SpeechSynthesisUtterance();
-                msg.text = text;
+                isSpeaking = true;
+                const msg = new SpeechSynthesisUtterance(text);
                 msg.lang = 'pt-PT';
+                msg.onend = () => {
+                    isSpeaking = false;
+                    log('Resposta falada concluída.');
+                };
                 window.speechSynthesis.speak(msg);
                 log(`Resposta falada: ${text}`);
             } else {

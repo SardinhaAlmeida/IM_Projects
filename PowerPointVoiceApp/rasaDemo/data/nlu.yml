@@ -20,3 +20,26 @@ nlu:
       - Vai para trás
       - Voltar slide
       - Retrocede para o slide anterior
+
+  - intent: fallback
+    examples: |
+      - qual é a próxima reunião?
+      - qual o tema de hoje?
+      - quanto tempo já passou?
+      - o que está no ecrã agora?
+      - preciso de um intervalo
+      - tem alguma pergunta?
+      - pode repetir a última parte?
+      - quando vamos terminar?
+      - esta parte não é clara
+      - quantas pessoas estão a assistir?
+      - que dia é hoje?
+      - vou já responder à pergunta
+      - desculpe, tive um problema técnico
+      - estou um pouco nervoso
+      - quero agradecer a todos por estarem aqui
+      - onde é que estava?
+      - obrigado pela atenção
+      - podem ouvir-me bem?
+      - esta luz é muito forte
+      - alguém tem alguma questão?

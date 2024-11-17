@@ -3,13 +3,17 @@ version: '3.1'
 intents:
   - next_slide
   - previous_slide
+  - fallback
 
 responses:
   utter_next_slide:
     - text: "Passando para o próximo slide."
 
   utter_previous_slide:
-    - text: "Voltando para o slide anterior."
+    - text: "Voltando ao slide anterior."
+
+  utter_default:
+    - text: "Desculpe, não percebi o que disse. Pode repetir?"
 
 actions:
   - action_next_slide

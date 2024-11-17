@@ -10,3 +10,9 @@ rules:
   steps:
   - intent: previous_slide
   - action: utter_previous_slide
+  
+- rule: Fallback rule
+  steps:
+  - intent: fallback
+  - action: utter_default
+  

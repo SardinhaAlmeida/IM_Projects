@@ -13,7 +13,7 @@ namespace PowerPointVoiceControl
             // Configuração do PowerPoint
             Application pptApp = new Application();
             Presentation presentation = pptApp.Presentations.Open(
-                @"C:\Users\Asus\OneDrive - Universidade de Aveiro\LEI - Sara Almeida\4ºano\IM\IM_Projects\PowerPointVoiceApp\ConsoleApp\IM First Presentation.pptx",
+                @"C:\Users\maria\Downloads\IM First Presentation.pptx",
                 Mso.MsoTriState.msoTrue,
                 Mso.MsoTriState.msoFalse,
                 Mso.MsoTriState.msoTrue);

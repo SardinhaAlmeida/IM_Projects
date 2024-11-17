@@ -3,13 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Slides por Voz</title>
+    <title>Controlo de Slides por Voz</title>
     <style>
         body {
+            --indicator-color: black;
+            background: #fff; /*radial-gradient(#fff 75%, var(--indicator-color));*/
+            min-height: 100vh;
+            color: burlywood;
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             text-align: center;
             padding: 20px;
+        }
+
+        .mic {
+            width: 150px;
+            margin: 20px auto;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            border-radius: 10px;
+            background-color: #f0f0f0;
+        }
+
+        .bottomNav {
+            position: absolute;
+            bottom: 2%;
+            width: 95%;
+        }
+
+        .recognized {
+            font-size: x-large;
         }
 
         h1 {
@@ -30,24 +58,60 @@
             display: inline-block;
             font-size: 1em;
         }
+
+        .responseText {
+            margin-top: 20px;
+            font-size: 1em;
+            border: solid 2px #8ea7cf;
+            margin: 2%;
+            color: #4F5D73;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: inline-block;
+        }
+
+        #version-info {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+
     </style>
 </head>
 <body>
-    <h1>Controle de Slides por Voz</h1>
+    <h1>Controlo de Slides por Voz</h1>
     <p>Diga "Próximo slide" ou "Slide anterior" para controlar a apresentação.</p>
+    <div id="version-info">Versão do PowerPoint: Carregando...</div>
     <div id="status">Iniciando reconhecimento de voz...</div>
+    <div class="responseText" id="response">Bem-vindo ao Assistente!</div>
+
+    <div>
+        <svg class="mic" id="mic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="32" fill="#4CAF50" />
+        </svg>
+    </div>
 
     <script>
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.interimResults = true;
         recognition.lang = 'pt-PT';
-        recognition.continuous = true;
-        recognition.interimResults = false;
 
         const statusDiv = document.getElementById('status');
+        const responseDiv = document.getElementById('response');
+        const micCircle = document.querySelector('#mic circle');
+
+        function log(message) {
+            console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
+        }
 
         recognition.onstart = () => {
             console.log('Reconhecimento de voz iniciado.');
-            statusDiv.textContent = 'Escutando comandos...';
+            statusDiv.textContent = 'Ouvindo comandos...';
+            micCircle.setAttribute('fill', '#00e676');
+
         };
 
         recognition.onresult = async (event) => {
@@ -55,49 +119,83 @@
             console.log(`Comando reconhecido: ${command}`);
             statusDiv.textContent = `Comando reconhecido: ${command}`;
 
-            let intent = '';
-            if (command.includes('próximo slide') || command.includes('próximo')) {
-                intent = 'next_slide';
-            } else if (command.includes('slide anterior') || command.includes('anterior')) {
-                intent = 'previous_slide';
-            }
+            try {
+                const response = await fetch('http://localhost:5005/model/parse', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: command }),
+                });
 
-            if (intent) {
-                try {
-                    const response = await fetch('http://localhost:5000/api/voice-command/', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ Intent: intent })
-                    });
+                if (response.ok) {
+                    const data = await response.json();
+                    const intent = data.intent.name;
+                    const confidence = data.intent.confidence;
+                    log(`Intent: ${intent}, Confiança: ${confidence}`);
 
-                    if (response.ok) {
-                        const responseText = await response.text();
-                        console.log(`Servidor respondeu: ${responseText}`);
-                        statusDiv.textContent = `Comando enviado: ${intent}. Resposta do servidor: ${responseText}`;
+                    if (confidence >= 0.7) {
+                        switch (intent) {
+                            case 'next_slide':
+                                sendVoiceCommand('next_slide', 'Passando para o próximo slide.');
+                                break;
+                            case 'previous_slide':
+                                sendVoiceCommand('previous_slide', 'Voltando ao slide anterior.');
+                                break;
+                            default:
+                                responseDiv.textContent = 'Comando não reconhecido.';
+                                log('Intent não reconhecida.');
+                                break;
+                        }
                     } else {
-                        console.error(`Erro do servidor: ${response.status}`);
-                        statusDiv.textContent = `Erro do servidor: ${response.status}`;
+                        responseDiv.textContent = 'Confiança baixa no comando reconhecido.';
+                        log('Confiança insuficiente.');
                     }
-                } catch (error) {
-                    console.error('Erro ao se comunicar com o backend:', error);
-                    statusDiv.textContent = 'Erro ao se comunicar com o backend.';
+                } else {
+                    responseDiv.textContent = 'Erro ao processar o comando.';
+                    log('Erro ao processar comando no servidor RASA.');
                 }
-            } else {
-                console.log('Comando não reconhecido.');
-                statusDiv.textContent = 'Comando não reconhecido.';
+            } catch (error) {
+                log(`Erro na comunicação com o RASA: ${error}`);
+                responseDiv.textContent = 'Erro na comunicação com o servidor.';
             }
         };
 
+        function sendVoiceCommand(intent, feedback) {
+            fetch('http://localhost:5000/api/voice-command/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Intent: intent }),
+            }).then(() => {
+                responseDiv.textContent = feedback;
+                speak(feedback);
+                log(`Comando enviado: ${intent} - ${feedback}`);
+            }).catch(error => {
+                log(`Erro ao enviar comando: ${error}`);
+            });
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                const msg = new SpeechSynthesisUtterance();
+                msg.text = text;
+                msg.lang = 'pt-PT';
+                window.speechSynthesis.speak(msg);
+                log(`Resposta falada: ${text}`);
+            } else {
+                log('SpeechSynthesis não é suportado neste navegador.');
+                responseDiv.textContent = 'Erro ao fornecer feedback auditivo.';
+            }
+        }
 
         recognition.onerror = (event) => {
             console.error('Erro no reconhecimento de voz:', event.error);
             statusDiv.textContent = `Erro no reconhecimento de voz: ${event.error}`;
+            micCircle.setAttribute('fill', '#ff5252');
         };
 
         recognition.onend = () => {
             console.log('Reconhecimento de voz finalizado. Reiniciando...');
             statusDiv.textContent = 'Reconhecimento de voz finalizado. Reiniciando...';
-            recognition.start(); // Always listening
+            setTimeout(() => recognition.start(), 1000); // Always listening
         };
 
         recognition.start(); // Start listening for commands

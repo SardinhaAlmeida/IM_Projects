@@ -11,6 +11,16 @@ rules:
   - intent: previous_slide
   - action: utter_previous_slide
   
+- rule: Handle jump to slide by title
+  steps:
+    - intent: jump_to_slide_by_title
+    - action: utter_confirm_title
+
+- rule: Handle jump to slide by number
+  steps:
+    - intent: jump_to_slide_by_number
+    - action: utter_confirm_number
+  
 - rule: Fallback rule
   steps:
   - intent: fallback

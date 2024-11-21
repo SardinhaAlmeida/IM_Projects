@@ -3,7 +3,27 @@ version: '3.1'
 intents:
   - next_slide
   - previous_slide
+  - jump_to_slide_by_title
+  - jump_to_slide_by_number
   - fallback
+
+entities:
+  - slide_title
+  - slide_number
+
+slots:
+  slide_title:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: slide_title
+
+  slide_number:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: slide_number
 
 responses:
   utter_next_slide:
@@ -11,6 +31,18 @@ responses:
 
   utter_previous_slide:
     - text: "Voltando ao slide anterior."
+  
+  utter_confirm_title:
+    - text: "Indo para o slide com o título: {slide_title}."
+  
+  utter_confirm_number:
+    - text: "Indo para o slide número: {slide_number}."
+  
+  utter_unknown_title:
+    - text: "Não encontrei um slide com o título: {slide_title}."
+  
+  utter_unknown_number:
+    - text: "O número do slide {slide_number} não é válido."
 
   utter_default:
     - text: "Desculpe, não percebi o que disse. Pode repetir?"

@@ -6,3 +6,7 @@ stories:
       - intent: next_slide
       - action: utter_next_slide
   
+  - story: Navigate to slide by title
+    steps:
+      - intent: jump_to_slide_by_title
+      - action: utter_confirm_title

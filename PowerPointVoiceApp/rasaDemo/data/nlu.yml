@@ -20,6 +20,25 @@ nlu:
       - Vai para trás
       - Voltar slide
       - Retrocede para o slide anterior
+ 
+  - intent: jump_to_slide_by_title
+    examples: |
+     - Mostra-me o slide com o título [Resultados](slide_title), por favor
+     - Passando para o slide de [Resultados](slide_title)
+     - Passando para o slide do [Resultados](slide_title)
+     - Passando para o slide da [Resultados](slide_title)
+     - Passando para o slide dos [Resultados](slide_title)
+     - Passando para o slide das [Resultados](slide_title)
+     - Quero ver o slide [Agenda](slide_title), por favor
+     - Muda para o slide [Introdução](slide_title)
+
+  - intent: jump_to_slide_by_number
+    examples: |
+     - Passando para o slide número [1](slide_number)
+     - Vai para o slide número [3](slide_number)
+     - Mostra-me o slide número [5](slide_number), por favor
+     - Muda para o slide número [2](slide_number)
+     - Quero o slide número [4](slide_number)
 
   - intent: fallback
     examples: |

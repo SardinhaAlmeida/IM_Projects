@@ -42,6 +42,46 @@ class ActionPreviousSlide(Action):
             dispatcher.utter_message(text=f"Erro ao voltar para o slide anterior: {e}")
         return []
 
+class ActionJumpToSlideByTitle(Action):
+    def name(self) -> Text:
+        return "action_jump_to_slide_by_title"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        slide_title = tracker.get_slot("slide_title")
+        if slide_title:
+            # Add logic to communicate with the WebSocket backend
+            # For example, send `slide_title` via WebSocket
+            dispatcher.utter_message(text=f"Indo para o slide com o título: {slide_title}.")
+        else:
+            dispatcher.utter_message(text="Não encontrei um título válido.")
+        return []
+
+class ActionJumpToSlideByNumber(Action):
+    def name(self) -> Text:
+        return "action_jump_to_slide_by_number"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+            slide_number = tracker.get_slot("slide_number")
+
+            if slide_number:
+                try:
+                    slide_number = int(slide_number)  # Ensure it's a valid number
+                    dispatcher.utter_message(text=f"Indo para o slide número {slide_number}.")
+
+                    # Send WebSocket command
+                    import websocket
+                    ws = websocket.create_connection("ws://localhost:5000/")
+                    command = {"Intent": "jump_to_slide", "SlideNumber": slide_number}
+                    ws.send(json.dumps(command))
+                    ws.close()
+                except ValueError:
+                    dispatcher.utter_message(text="O número do slide fornecido não é válido.")
+            else:
+                dispatcher.utter_message(text="Nenhum número de slide fornecido.")
+
+            return []
+
+
 
 class ActionDebugVoice(Action):
     def name(self) -> str:

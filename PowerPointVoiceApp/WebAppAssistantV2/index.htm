@@ -310,12 +310,13 @@
         function sendVoiceCommand(intent, feedback, additionalData = {}) {
             if (socket && socket.readyState === WebSocket.OPEN) {
                 const message = JSON.stringify({ Intent: intent, ...additionalData });
-                if (SlideNumber) {
-                    console.log(`Payload sent to WebSocket: ${JSON.stringify({ Intent: intent, SlideNumber: additionalData?.slideNumber })}`);
-                }
-                if (SlideTitle) {
-                    console.log(`Sending payload: ${JSON.stringify({ Intent: intent, SlideTitle: slideTitle })}`);
-                }
+                console.log(`Payload sent to WebSocket: ${message}`); // Debug log
+                //if (SlideNumber) {
+                //    console.log(`Payload sent to WebSocket: ${JSON.stringify({ Intent: intent, SlideNumber: additionalData?.slideNumber })}`);
+                //}
+                //if (SlideTitle) {
+                //    console.log(`Sending payload: ${JSON.stringify({ Intent: intent, SlideTitle: slideTitle })}`);
+                //}
                 socket.send(message);
                 console.log(`Comando enviado: ${intent}`);
                 responseDiv.textContent = feedback;

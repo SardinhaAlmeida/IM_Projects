@@ -4,6 +4,8 @@ from rasa_sdk.executor import CollectingDispatcher
 import win32com.client
 
 import requests
+import websocket
+import json 
 
 class ActionNextSlide(Action):
     def name(self) -> Text:
@@ -48,10 +50,16 @@ class ActionJumpToSlideByTitle(Action):
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         slide_title = tracker.get_slot("slide_title")
+        print(f"Slide Title received: {slide_title}")
         if slide_title:
-            # Add logic to communicate with the WebSocket backend
-            # For example, send `slide_title` via WebSocket
-            dispatcher.utter_message(text=f"Indo para o slide com o título: {slide_title}.")
+            try:
+                ws = websocket.create_connection("ws://localhost:5000/")
+                command = {"Intent": "jump_to_slide_by_title", "SlideTitle": slide_title}
+                ws.send(json.dumps(command))
+                ws.close()
+                dispatcher.utter_message(text=f"Indo para o slide com o título: {slide_title}.")
+            except Exception as e:
+                dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
         else:
             dispatcher.utter_message(text="Não encontrei um título válido.")
         return []

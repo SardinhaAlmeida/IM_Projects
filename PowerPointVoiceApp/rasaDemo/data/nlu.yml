@@ -23,7 +23,7 @@ nlu:
  
   - intent: jump_to_slide_by_title
     examples: |
-     - Mostra-me o slide com o título [Resultados](slide_title), por favor
+     - Mostra-me o slide com o título [Introdução](slide_title), por favor
      - Passando para o slide de [Resultados](slide_title)
      - Passando para o slide do [Resultados](slide_title)
      - Passando para o slide da [Resultados](slide_title)

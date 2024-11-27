@@ -71,6 +71,7 @@ responses:
 actions:
   - action_next_slide
   - action_previous_slide
+  - action_jump_to_slide_title 
   - action_highlight_phrase
 
 

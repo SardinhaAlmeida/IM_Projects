@@ -6,6 +6,8 @@ intents:
   - jump_to_slide_by_title
   - jump_to_slide_by_number
   - highlight_phrase
+  - zoom_in
+  - zoom_out
   - fallback
 
 entities:
@@ -56,6 +58,12 @@ responses:
   
   utter_unknown_phrase:
     - text: "Não encontrei a frase que pediu para sublinhar."
+  
+  utter_zoom_in:
+    - text: "Zoom aplicado à imagem."
+
+  utter_zoom_out:
+    - text: "Imagem revertida ao tamanho original."
 
   utter_default:
     - text: "Desculpe, não percebi o que disse. Pode repetir?"

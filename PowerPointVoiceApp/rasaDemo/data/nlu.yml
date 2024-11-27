@@ -48,6 +48,22 @@ nlu:
      - Sublinha a frase [Este é um destaque](phrase)
      - Destaca [Plano inicial](phrase)
 
+  - intent: zoom_in
+    examples: |
+      - Aumenta a imagem
+      - Focar na imagem
+      - Zoom in
+      - Amplia a imagem
+      - Destacar a imagem
+
+  - intent: zoom_out
+    examples: |
+      - Diminui a imagem
+      - Voltar ao tamanho original
+      - Zoom out
+      - Reverter o zoom
+      - Voltar ao normal
+
   - intent: fallback
     examples: |
       - qual é a próxima reunião?

@@ -112,6 +112,45 @@ class ActionHighlightPhrase(Action):
 
         return []
 
+class ActionZoomIn(Action):
+    def name(self) -> Text:
+        return "action_zoom_in"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        try:
+            # Send WebSocket command for Zoom In
+            ws = websocket.create_connection("ws://localhost:5000/")
+            command = {"Intent": "zoom_in"}
+            ws.send(json.dumps(command))
+            ws.close()
+
+            dispatcher.utter_message(text="Ampliando a imagem ou forma no slide atual.")
+        except Exception as e:
+            dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
+
+        return []
+
+
+class ActionZoomOut(Action):
+    def name(self) -> Text:
+        return "action_zoom_out"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        try:
+            # Send WebSocket command for Zoom Out
+            ws = websocket.create_connection("ws://localhost:5000/")
+            command = {"Intent": "zoom_out"}
+            ws.send(json.dumps(command))
+            ws.close()
+
+            dispatcher.utter_message(text="Restaurando a imagem ou forma ao tamanho original.")
+        except Exception as e:
+            dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
+
+        return []
+
+
+
 
 class ActionDebugVoice(Action):
     def name(self) -> str:

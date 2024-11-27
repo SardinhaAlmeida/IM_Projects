@@ -26,6 +26,16 @@ rules:
     - intent: highlight_phrase
     - action: action_highlight_phrase
   
+- rule: Handle zoom in
+  steps:
+    - intent: zoom_in
+    - action: utter_zoom_in
+
+- rule: Handle zoom out
+  steps:
+    - intent: zoom_out
+    - action: utter_zoom_out
+
 - rule: Fallback rule
   steps:
   - intent: fallback

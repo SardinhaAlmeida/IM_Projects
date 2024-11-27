@@ -324,6 +324,41 @@ namespace PowerPointWebSocketControl
                         }
                         return "Frase não fornecida.";
 
+                    case "zoom_in":
+                        {
+                            foreach (Slide slide in _presentation.Slides)
+                            {
+                                foreach (Shape shape in slide.Shapes)
+                                {
+                                    if (shape.Type == Mso.MsoShapeType.msoPicture || shape.Type == Mso.MsoShapeType.msoAutoShape)
+                                    {
+                                        shape.Width *= 1.5f; // Aumenta 50% do tamanho
+                                        shape.Height *= 1.5f;
+                                        return "Zoom aplicado à imagem.";
+                                    }
+                                }
+                            }
+                            return "Nenhuma imagem encontrada para ampliar.";
+                        }
+
+                    case "zoom_out":
+                        {
+                            foreach (Slide slide in _presentation.Slides)
+                            {
+                                foreach (Shape shape in slide.Shapes)
+                                {
+                                    if (shape.Type == Mso.MsoShapeType.msoPicture || shape.Type == Mso.MsoShapeType.msoAutoShape)
+                                    {
+                                        shape.Width /= 1.5f; // Reduz 50% do tamanho
+                                        shape.Height /= 1.5f;
+                                        return "Zoom revertido ao tamanho original.";
+                                    }
+                                }
+                            }
+                            return "Nenhuma imagem encontrada para reduzir.";
+                        }
+
+
                     default:
                         return "Comando não reconhecido.";
                 }

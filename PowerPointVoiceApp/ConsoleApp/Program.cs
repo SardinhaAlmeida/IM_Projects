@@ -146,6 +146,7 @@
 //    }
 //}
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
@@ -297,6 +298,31 @@ namespace PowerPointWebSocketControl
                         }
                         return "Número de slide não fornecido.";
 
+                    case "highlight_phrase":
+                        if (!string.IsNullOrEmpty(command.Phrase))
+                        {
+                            string phraseToHighlight = command.Phrase.Trim();
+                            foreach (Slide slide in _presentation.Slides)
+                            {
+                                foreach (Shape shape in slide.Shapes)
+                                {
+                                    if (shape.HasTextFrame == Mso.MsoTriState.msoTrue)
+                                    {
+                                        string text = shape.TextFrame.TextRange.Text;
+                                        int startIndex = text.IndexOf(phraseToHighlight, StringComparison.OrdinalIgnoreCase);
+                                        if (startIndex >= 0)
+                                        {
+                                            TextRange foundText = shape.TextFrame.TextRange.Characters(startIndex + 1, phraseToHighlight.Length);
+                                            foundText.Font.Bold = Mso.MsoTriState.msoTrue;
+                                            foundText.Font.Underline = Mso.MsoTriState.msoTrue;
+                                            return $"Sublinhando a frase: {phraseToHighlight}.";
+                                        }
+                                    }
+                                }
+                            }
+                            return $"A frase '{command.Phrase}' não foi encontrada em nenhum slide.";
+                        }
+                        return "Frase não fornecida.";
 
                     default:
                         return "Comando não reconhecido.";
@@ -315,5 +341,6 @@ namespace PowerPointWebSocketControl
         public string Intent { get; set; }
         public string SlideTitle { get; set; } // For jump_to_slide_by_title
         public string SlideNumber { get; set; }  // For jump_to_slide_by_number
+        public string Phrase { get; set; } // For highlight_phrase
     }
 }

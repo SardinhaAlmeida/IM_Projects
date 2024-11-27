@@ -264,6 +264,14 @@
                     } else {
                         responseDiv.textContent = 'Número do slide não fornecido.';
                     }
+                case "highlight_phrase":
+                    const phrase = entities.find((e) => e.entity === "phrase")?.value || "";
+                    if (phrase) {
+                        sendVoiceCommand("highlight_phrase", `Sublinhando a frase: ${phrase}`, { Phrase: phrase });
+                    } else {
+                        responseDiv.textContent = "Frase não fornecida.";
+                    }
+                    break;
                 default:
                     responseDiv.textContent = 'Comando não reconhecido.';
                     console.log('Intent não reconhecida.');

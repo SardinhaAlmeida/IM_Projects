@@ -89,6 +89,28 @@ class ActionJumpToSlideByNumber(Action):
 
             return []
 
+class ActionHighlightPhrase(Action):
+    def name(self) -> Text:
+        return "action_highlight_phrase"
+
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        phrase = tracker.get_slot("phrase")
+        if not phrase:
+            dispatcher.utter_message(text="Não encontrei a frase que pediu para sublinhar.")
+            return []
+
+        try:
+            # Conectar ao WebSocket para enviar o comando
+            ws = websocket.create_connection("ws://localhost:5000/")
+            command = {"Intent": "highlight_phrase", "Phrase": phrase}
+            ws.send(json.dumps(command))
+            ws.close()
+
+            dispatcher.utter_message(text=f"Sublinhando a frase: {phrase}.")
+        except Exception as e:
+            dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
+
+        return []
 
 
 class ActionDebugVoice(Action):

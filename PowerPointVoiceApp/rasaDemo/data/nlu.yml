@@ -40,6 +40,14 @@ nlu:
      - Muda para o slide número [2](slide_number)
      - Quero o slide número [4](slide_number)
 
+  - intent: highlight_phrase
+    examples: |
+     - Sublinhar a frase [Resultados esperados](phrase)
+     - Quero sublinhar a frase [Conclusão final](phrase)
+     - Destacar a frase [Introdução](phrase)
+     - Sublinha a frase [Este é um destaque](phrase)
+     - Destaca [Plano inicial](phrase)
+
   - intent: fallback
     examples: |
       - qual é a próxima reunião?

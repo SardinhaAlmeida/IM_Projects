@@ -20,6 +20,11 @@ rules:
   steps:
     - intent: jump_to_slide_by_number
     - action: utter_confirm_number
+ 
+- rule: Handle highlight phrase
+  steps:
+    - intent: highlight_phrase
+    - action: action_highlight_phrase
   
 - rule: Fallback rule
   steps:

@@ -5,11 +5,13 @@ intents:
   - previous_slide
   - jump_to_slide_by_title
   - jump_to_slide_by_number
+  - highlight_phrase
   - fallback
 
 entities:
   - slide_title
   - slide_number
+  - phrase
 
 slots:
   slide_title:
@@ -17,6 +19,11 @@ slots:
     mappings:
       - type: from_entity
         entity: slide_title
+  phrase:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: phrase
 
   slide_number:
     type: text
@@ -43,6 +50,12 @@ responses:
   
   utter_unknown_number:
     - text: "O número do slide {slide_number} não é válido."
+  
+  utter_highlight_phrase:
+    - text: "Sublinhando a frase: {phrase}."
+  
+  utter_unknown_phrase:
+    - text: "Não encontrei a frase que pediu para sublinhar."
 
   utter_default:
     - text: "Desculpe, não percebi o que disse. Pode repetir?"
@@ -50,6 +63,8 @@ responses:
 actions:
   - action_next_slide
   - action_previous_slide
+  - action_highlight_phrase
+
 
 session_config:
   session_expiration_time: 60

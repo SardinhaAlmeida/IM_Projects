@@ -1,150 +1,255 @@
 ﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
 //using System.Net;
+//using System.Net.WebSockets;
+//using System.Text;
 //using System.Text.Json;
+//using System.Threading;
+//using System.Threading.Tasks;
+//using Newtonsoft.Json;
 //using Microsoft.Office.Interop.PowerPoint;
 //using Mso = Microsoft.Office.Core;
+//using System.Xml.Linq;
 
-//namespace PowerPointVoiceControl
+//namespace PowerPointWebSocketControl
 //{
 //    internal class Program
 //    {
-//        static void Main(string[] args)
+//        private static Presentation _presentation;
+//        private static Dictionary<string, (float Width, float Height, float Left, float Top)> _originalShapes = new Dictionary<string, (float, float, float, float)>();
+//        private static DateTime _startTime;
+
+//        static async Task Main(string[] args)
 //        {
-//            // Configuração do PowerPoint
-
-
-//            Application pptApp = new Application();
-//            Presentation presentation = pptApp.Presentations.Open(
-//                @"C:\Users\Asus\OneDrive - Universidade de Aveiro\LEI - Sara Almeida\4ºano\IM\IM_Projects\PowerPointVoiceApp\ConsoleApp\IM First Presentation.pptx",
-//                Mso.MsoTriState.msoTrue,
-//                Mso.MsoTriState.msoFalse,
-//                Mso.MsoTriState.msoTrue);
-
-//            presentation.SlideShowSettings.Run();
-
-//            // Configuração do HttpListener
-//            HttpListener listener = new HttpListener();
-//            listener.Prefixes.Add("http://localhost:5000/api/voice-command/");
-//            listener.Start();
-//            Console.WriteLine("Servidor em execução...");
-//            while (true)
-//            {
-//                try
-//                {
-//                    var context = listener.GetContext();
-//                    var request = context.Request;
-
-//                    if (request.HttpMethod == "OPTIONS")
-//                    {
-//                        // Respond to CORS preflight requests
-//                        var response = context.Response;
-//                        AddCorsHeaders(response);
-//                        response.StatusCode = (int)HttpStatusCode.OK;
-//                        response.Close();
-//                        continue;
-//                    }
-
-//                    if (request.HttpMethod == "POST")
-//                    {
-//                        using (var reader = new System.IO.StreamReader(request.InputStream, request.ContentEncoding))
-//                        {
-//                            var body = reader.ReadToEnd();
-//                            VoiceCommand command;
-
-//                            try
-//                            {
-//                                command = JsonSerializer.Deserialize<VoiceCommand>(body);
-//                            }
-//                            catch (JsonException)
-//                            {
-//                                Console.WriteLine("Erro ao desserializar o comando.");
-//                                SendResponse(context.Response, "Formato JSON inválido.", HttpStatusCode.BadRequest);
-//                                continue;
-//                            }
-
-//                            if (command == null || string.IsNullOrEmpty(command.Intent))
-//                            {
-//                                Console.WriteLine("Comando vazio ou inválido recebido.");
-//                                SendResponse(context.Response, "Comando inválido.", HttpStatusCode.BadRequest);
-//                                continue;
-//                            }
-
-//                            string responseMessage = HandleCommand(command, presentation);
-//                            SendResponse(context.Response, responseMessage, HttpStatusCode.OK);
-//                        }
-//                    }
-//                    else
-//                    {
-//                        Console.WriteLine($"Método {request.HttpMethod} não suportado.");
-//                        SendResponse(context.Response, "Método não suportado.", HttpStatusCode.MethodNotAllowed);
-//                    }
-//                }
-//                catch (Exception ex)
-//                {
-//                    Console.WriteLine($"Erro no servidor: {ex.Message}");
-//                }
-//            }
-
-//        }
-
-//        private static void AddCorsHeaders(HttpListenerResponse response)
-//        {
-//            response.Headers.Add("Access-Control-Allow-Origin", "*");
-//            response.Headers.Add("Access-Control-Allow-Methods", "POST, OPTIONS");
-//            response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
-//        }
-
-//        private static void SendResponse(HttpListenerResponse response, string message, HttpStatusCode statusCode)
-//        {
-//            AddCorsHeaders(response);
-
-//            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(message);
-//            response.StatusCode = (int)statusCode;
-//            response.ContentLength64 = buffer.Length;
-
+//            Console.WriteLine("Application starting...");
 //            try
 //            {
-//                using (var output = response.OutputStream)
+//                Console.WriteLine("Initializing PowerPoint...");
+//                Application pptApp = new Application();
+//                _presentation = pptApp.Presentations.Open(
+//                    @"C:\Users\Asus\OneDrive - Universidade de Aveiro\LEI - Sara Almeida\4ºano\IM\IM_Projects\PowerPointVoiceApp\ConsoleApp\IM First Presentation.pptx",
+//                    Mso.MsoTriState.msoTrue,
+//                    Mso.MsoTriState.msoFalse,
+//                    Mso.MsoTriState.msoTrue);
+
+//                Console.WriteLine("Running slideshow...");
+//                _presentation.SlideShowSettings.Run();
+//                _startTime = DateTime.Now;
+
+//                Console.WriteLine("Initializing WebSocket...");
+//                ClientWebSocket client = await Init();
+
+//                Console.WriteLine("Starting message processing...");
+//                var cancellationTokenSource = new CancellationTokenSource();
+//                CancellationToken cancellationToken = cancellationTokenSource.Token;
+
+//                Start processing WebSocket messages
+//                var messageProcessingTask = Task.Run(async () =>
 //                {
-//                    output.Write(buffer, 0, buffer.Length);
-//                }
+//                    while (client.State == WebSocketState.Open && !cancellationToken.IsCancellationRequested)
+//                    {
+//                        await ProcessMessages(client);
+//                    }
+//                });
+
+//                Console.WriteLine("Application running.");
+//                await messageProcessingTask;
 //            }
 //            catch (Exception ex)
 //            {
-//                Console.WriteLine($"Erro ao enviar a resposta: {ex.Message}");
+//                Console.WriteLine($"Application error: {ex.Message}");
 //            }
 //        }
 
 
-
-//        private static string HandleCommand(VoiceCommand command, Presentation presentation)
+//        public static async Task<ClientWebSocket> Init()
 //        {
-//            if (command == null || string.IsNullOrEmpty(command.Intent))
+
+//            string host = "127.0.0.1"; // Replace with your actual host
+//            string path = "/IM/USER1/APP"; // Replace with your WebSocket path
+//            ClientWebSocket client = new ClientWebSocket();
+
+//            try
 //            {
-//                return "Comando inválido.";
+//                Console.WriteLine("Starting WebSocket initialization...");
+//                Uri uri = new Uri("wss://" + host + ":8005" + path);
+//                Console.WriteLine($"Connecting to {uri}...");
+
+//                await client.ConnectAsync(uri, CancellationToken.None);
+//                Console.WriteLine("Connected to the WebSocket server.");
+//                IMPORTANTE
+//                Handle messages and other logic here
+//               await ProcessMessages(client);
+
+//                Close the WebSocket when done
+//               await client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed", CancellationToken.None);
+//                if (client.State != WebSocketState.Open)
+//                {
+//                    Console.WriteLine("WebSocket connection closed. Attempting to reconnect...");
+//                    client = await Init(); // Reconnect logic
+//                }
+
+//            }
+//            catch (Exception ex)
+//            {
+//                Console.WriteLine($"WebSocket connection error: {ex.Message}");
 //            }
 
-//            switch (command.Intent.ToLower())
+//            return client;
+//        }
+//        private static async Task ProcessMessages(ClientWebSocket client)
+//        {
+//            byte[] buffer = new byte[1024];
+//            while (client.State == WebSocketState.Open)
+//            {
+//                WebSocketReceiveResult result = await client.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+//                string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+//                Console.WriteLine($"Received message: {message}");
+
+//                dynamic messageJSON = JsonConvert.DeserializeObject(message);
+//                if (messageJSON != null && messageJSON.nlu != null)
+//                {
+//                    string intent = messageJSON.nlu.intent;
+//                    string response = HandleIntent(intent, messageJSON);
+//                    await SendMessage(client, response);
+//                }
+//                else
+//                {
+//                    await SendMessage(client, CreateMMIMessage("Desculpe, não entendi o comando."));
+//                }
+//            }
+//        }
+
+//        private static string HandleIntent(string intent, dynamic messageJSON)
+//        {
+//            Console.WriteLine($"[INFO] Received intent: {intent}, Parameters: {JsonConvert.SerializeObject(messageJSON)}");
+
+//            switch (intent)
 //            {
 //                case "next_slide":
-//                    presentation.SlideShowWindow.View.Next();
-//                    return "Próximo slide.";
+//                    if (_presentation.SlideShowWindow != null)
+//                    {
+//                        Console.WriteLine("Presentation is in slideshow mode.");
+//                        _presentation.SlideShowWindow.View.Next();
+//                        return CreateMMIMessage("Avançando para o próximo slide.");
+//                    }
+//                    else
+//                    {
+//                        Console.WriteLine("No active slideshow window.");
+//                        return "Nenhum slideshow ativo.";
+//                    }
 
 //                case "previous_slide":
-//                    presentation.SlideShowWindow.View.Previous();
-//                    return "Slide anterior.";
+//                    _presentation.SlideShowWindow.View.Previous();
+//                    return CreateMMIMessage("Voltando ao slide anterior.");
+
+//                case "highlight_text":
+//                    {
+//                        string phraseToHighlight = messageJSON.nlu.text;
+//                        bool found = false;
+
+//                        foreach (Slide slide in _presentation.Slides)
+//                        {
+//                            foreach (Shape shape in slide.Shapes)
+//                            {
+//                                if (shape.HasTextFrame == Mso.MsoTriState.msoTrue)
+//                                {
+//                                    string text = shape.TextFrame.TextRange.Text;
+//                                    int startIndex = text.IndexOf(phraseToHighlight, StringComparison.OrdinalIgnoreCase);
+//                                    if (startIndex >= 0)
+//                                    {
+//                                        TextRange foundText = shape.TextFrame.TextRange.Characters(startIndex + 1, phraseToHighlight.Length);
+//                                        foundText.Font.Bold = Mso.MsoTriState.msoTrue;
+//                                        foundText.Font.Underline = Mso.MsoTriState.msoTrue;
+//                                        Console.WriteLine($"Phrase '{phraseToHighlight}' highlighted.");
+//                                        found = true;
+//                                        break;
+//                                    }
+//                                }
+//                            }
+//                            if (found) break;
+//                        }
+
+//                        if (found)
+//                            return CreateMMIMessage($"Texto '{phraseToHighlight}' destacado.");
+//                        else
+//                            return CreateMMIMessage($"Não foi possível destacar o texto '{phraseToHighlight}'.");
+//                    }
+
+//                case "jump_to_slide_by_title":
+//                    {
+//                        string title = messageJSON.nlu.title;
+//                        bool found = false;
+
+//                        foreach (Slide slide in _presentation.Slides)
+//                        {
+//                            if (slide.Shapes.HasTitle == Mso.MsoTriState.msoTrue &&
+//                                slide.Shapes.Title.TextFrame.TextRange.Text.Equals(title, StringComparison.OrdinalIgnoreCase))
+//                            {
+//                                _presentation.SlideShowWindow.View.GotoSlide(slide.SlideIndex);
+//                                found = true;
+//                                break;
+//                            }
+//                        }
+
+//                        if (found)
+//                            return CreateMMIMessage($"Indo para o slide com o título '{title}'.");
+//                        else
+//                            return CreateMMIMessage($"Slide com o título '{title}' não encontrado.");
+//                    }
+
+//                case "jump_to_slide_by_number":
+//                    {
+//                        int slideNumber = (int)messageJSON.nlu.number;
+
+//                        if (slideNumber > 0 && slideNumber <= _presentation.Slides.Count)
+//                        {
+//                            _presentation.SlideShowWindow.View.GotoSlide(slideNumber);
+//                            return CreateMMIMessage($"Indo para o slide número {slideNumber}.");
+//                        }
+//                        else
+//                        {
+//                            return CreateMMIMessage($"Slide número {slideNumber} não encontrado.");
+//                        }
+//                    }
 
 //                default:
-//                    return "Comando não reconhecido.";
+//                    return CreateMMIMessage("Comando não reconhecido.");
 //            }
 //        }
-//    }
 
-//    public class VoiceCommand
-//    {
-//        public string Intent { get; set; }
+
+//        private static string GetElapsedTime()
+//        {
+//            TimeSpan elapsedTime = DateTime.Now - _startTime;
+//            return $"Tempo decorrido: {elapsedTime.Hours} horas, {elapsedTime.Minutes} minutos e {elapsedTime.Seconds} segundos.";
+//        }
+
+//        private static async Task SendMessage(ClientWebSocket client, string message)
+//        {
+//            byte[] buffer = Encoding.UTF8.GetBytes(message);
+//            await client.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+//            Console.WriteLine($"Sent message: {message}");
+//        }
+
+//        private static string CreateMMIMessage(string text)
+//        {
+//            return "<mmi:mmi xmlns:mmi=\"http://www.w3.org/2008/04/mmi-arch\" mmi:version=\"1.0\">" +
+//                        "<mmi:startRequest mmi:context=\"ctx-1\" mmi:requestId=\"text-1\" mmi:source=\"APPSPEECH\" mmi:target=\"IM\">" +
+//                            "<mmi:data>" +
+//                                "<emma:emma xmlns:emma=\"http://www.w3.org/2003/04/emma\" emma:version=\"1.0\">" +
+//                                    "<emma:interpretation emma:confidence=\"1\" emma:id=\"text-\" emma:medium=\"text\" emma:mode=\"command\" emma:start=\"0\">" +
+//                                        "<command>\"&lt;speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.w3.org/2001/10/synthesis http://www.w3.org/TR/speech-synthesis/synthesis.xsd\" xml:lang=\"pt-PT\"&gt;&lt;p&gt;" + text + "&lt;/p&gt;&lt;/speak&gt;\"</command>" +
+//                                    "</emma:interpretation>" +
+//                                    "</emma:emma>" +
+//                            "</mmi:data>" +
+//                        "</mmi:startRequest>" +
+//                    "</mmi:mmi>";
+//        }
 //    }
 //}
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -154,269 +259,128 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Microsoft.Office.Interop.PowerPoint;
 using Mso = Microsoft.Office.Core;
+using System.Xml.Linq;
 
-namespace PowerPointWebSocketControl
+class Program
+
 {
-    internal class Program
+    private static Presentation _presentation;
+
+    static async Task Main(string[] args)
     {
-        private static Presentation _presentation;
-        private static Dictionary<string, (float Width, float Height, float Left, float Top)> _originalShapes = new Dictionary<string, (float, float, float, float)>();
-        private static DateTime _startTime;
+        string host = "127.0.0.1"; // Replace with your actual host
+        string path = "/IM/USER1/APP"; // Replace with your WebSocket path
 
-        static async Task Main(string[] args)
+        // Receive Messages from rasa
+        using (ClientWebSocket client = new ClientWebSocket())
         {
-            Console.WriteLine("Starting PowerPoint WebSocket Control...");
+            Uri uri = new Uri("wss://" + host + ":8005" + path);
 
-            // Initialize PowerPoint
-            Application pptApp = new Application();
-            _presentation = pptApp.Presentations.Open(
-                @"C:\Users\maria\Downloads\IM First Presentation.pptx",
-                Mso.MsoTriState.msoTrue,
-                Mso.MsoTriState.msoFalse,
-                Mso.MsoTriState.msoTrue);
-
-            _presentation.SlideShowSettings.Run();
-            _startTime = DateTime.Now;
-
-            // Start WebSocket Server
-            HttpListener listener = new HttpListener();
-            listener.Prefixes.Add("http://localhost:5000/");
-            listener.Start();
-            Console.WriteLine("WebSocket server started. Listening on ws://localhost:5000/");
-
-            while (true)
-            {
-                var context = await listener.GetContextAsync();
-                if (context.Request.IsWebSocketRequest)
-                {
-                    var webSocketContext = await context.AcceptWebSocketAsync(null);
-                    Console.WriteLine("WebSocket client connected.");
-
-                    await HandleWebSocketConnection(webSocketContext.WebSocket);
-                }
-                else
-                {
-                    context.Response.StatusCode = 400;
-                    context.Response.Close();
-                }
-            }
-        }
-
-        private static string GetElapsedTime()
-        {
-            TimeSpan elapsedTime = DateTime.Now - _startTime;
-            return $"Tempo decorrido: {elapsedTime.Hours} horas, {elapsedTime.Minutes} minutos e {elapsedTime.Seconds} segundos.";
-        }
-
-        private static void HandleCors(HttpListenerResponse response)
-        {
-            response.Headers.Add("Access-Control-Allow-Origin", "*");
-            response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-            response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
-            response.StatusCode = (int)HttpStatusCode.OK;
-            response.Close();
-        }
-
-        private static async Task HandleWebSocketConnection(WebSocket webSocket)
-        {
-            var buffer = new byte[1024 * 4];
-
-            while (webSocket.State == WebSocketState.Open)
-            {
-                try
-                {
-                    // Receive a message
-                    var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                    if (result.MessageType == WebSocketMessageType.Close)
-                    {
-                        Console.WriteLine("WebSocket client disconnected.");
-                        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-                        break;
-                    }
-
-                    var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                    Console.WriteLine($"Received message: {message}");
-
-                    // Process the command and provide feedback
-                    var response = HandleCommand(message);
-                    var responseBytes = Encoding.UTF8.GetBytes(response);
-
-                    // Send the response back to the client
-                    await webSocket.SendAsync(new ArraySegment<byte>(responseBytes), WebSocketMessageType.Text, true, CancellationToken.None);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error handling WebSocket message: {ex.Message}");
-                }
-            }
-        }
-
-        private static string HandleCommand(string message)
-        {
             try
             {
-                // Parse the received message (assume it's JSON)
-                var command = JsonSerializer.Deserialize<VoiceCommand>(message);
-                if (command == null || string.IsNullOrEmpty(command.Intent))
-                {
-                    return "Invalid command.";
-                }
+                await client.ConnectAsync(uri, CancellationToken.None);
 
-                Console.WriteLine($"Raw WebSocket message received: {message}");
-                Console.WriteLine($"Received Intent: {command.Intent} with additional data: {message}");
+                Console.WriteLine("Connected to the WebSocket server.");
 
-                switch (command.Intent.ToLower())
-                {
-                    case "next_slide":
-                        _presentation.SlideShowWindow.View.Next();
-                        return "Próximo slide.";
+                // Handle messages and other logic here
+                await ProcessMessages(client);
 
-                    case "previous_slide":
-                        _presentation.SlideShowWindow.View.Previous();
-                        return "Slide anterior.";
-
-                    case "jump_to_slide_by_title":
-                        if (!string.IsNullOrEmpty(command.SlideTitle))
-                        {
-                            string normalizedTitle = command.SlideTitle.Trim();
-                            Console.WriteLine($"Received SlideTitle: {normalizedTitle}");
-                            foreach (Slide slide in _presentation.Slides)
-                            {
-                                if (slide.Shapes.HasTitle == Mso.MsoTriState.msoTrue &&
-                                    slide.Shapes.Title.TextFrame.TextRange.Text.Equals(normalizedTitle, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    _presentation.SlideShowWindow.View.GotoSlide(slide.SlideIndex);
-                                    return $"Indo para o slide: {command.SlideTitle}.";
-                                }
-                            }
-                            return $"Slide com o título '{command.SlideTitle}' não encontrado.";
-                        }
-                        return "Título do slide não fornecido.";
-
-                    case "jump_to_slide_by_number":
-                        if (!string.IsNullOrEmpty(command.SlideNumber))
-                        {
-                            Console.WriteLine($"Received SlideNumber: {command.SlideNumber}");
-                            if (int.TryParse(command.SlideNumber, out int slideNumber) &&
-                                slideNumber > 0 &&
-                                slideNumber <= _presentation.Slides.Count)
-                            {
-                                _presentation.SlideShowWindow.View.GotoSlide(slideNumber);
-                                return $"Indo para o slide número {slideNumber}.";
-                            }
-                            return "Número de slide inválido.";
-                        }
-                        return "Número de slide não fornecido.";
-
-                    case "highlight_phrase":
-                        if (!string.IsNullOrEmpty(command.Phrase))
-                        {
-                            Console.WriteLine($"Phrase to highlight: {command.Phrase}");
-                            string phraseToHighlight = command.Phrase.Trim();
-                            foreach (Slide slide in _presentation.Slides)
-                            {
-                                foreach (Shape shape in slide.Shapes)
-                                {
-                                    if (shape.HasTextFrame == Mso.MsoTriState.msoTrue)
-                                    {
-                                        string text = shape.TextFrame.TextRange.Text;
-                                        int startIndex = text.IndexOf(phraseToHighlight, StringComparison.OrdinalIgnoreCase);
-                                        if (startIndex >= 0)
-                                        {
-                                            TextRange foundText = shape.TextFrame.TextRange.Characters(startIndex + 1, phraseToHighlight.Length);
-                                            foundText.Font.Bold = Mso.MsoTriState.msoTrue;
-                                            foundText.Font.Underline = Mso.MsoTriState.msoTrue;
-                                            Console.WriteLine($"Phrase '{phraseToHighlight}' highlighted.");
-                                            return $"Sublinhando a frase: {phraseToHighlight}.";
-                                        }
-                                    }
-                                }
-                            }
-                            Console.WriteLine($"Phrase '{command.Phrase}' not found.");
-                            return $"A frase '{command.Phrase}' não foi encontrada em nenhum slide.";
-                        }
-                        return "Frase não fornecida.";
-
-                    case "zoom_in":
-                        {
-                            var slide = _presentation.SlideShowWindow.View.Slide;
-                            Shape focusShape = null;
-                            float maxArea = 0;
-
-                            foreach (Shape shape in slide.Shapes)
-                            {
-                                if (shape.Type == Mso.MsoShapeType.msoPicture || shape.Type == Mso.MsoShapeType.msoAutoShape)
-                                {
-                                    float area = shape.Width * shape.Height;
-                                    if (area > maxArea)
-                                    {
-                                        maxArea = area;
-                                        focusShape = shape;
-                                    }
-
-                                    // Armazena os tamanhos e posições originais, se ainda não estiverem salvos
-                                    if (!_originalShapes.ContainsKey(shape.Name))
-                                    {
-                                        _originalShapes[shape.Name] = (shape.Width, shape.Height, shape.Left, shape.Top);
-                                    }
-                                }
-                            }
-
-                            if (focusShape != null)
-                            {
-                                // Ampliar e centralizar
-                                focusShape.Width *= 1.5f;
-                                focusShape.Height *= 1.5f;
-                                focusShape.Left = (_presentation.PageSetup.SlideWidth - focusShape.Width) / 2;
-                                focusShape.Top = (_presentation.PageSetup.SlideHeight - focusShape.Height) / 2;
-
-                                return $"Simulando zoom na área principal: {focusShape.Name}.";
-                            }
-
-                            return "Nenhuma área principal foi encontrada no slide para aplicar zoom.";
-                        }
-
-                    case "zoom_out":
-                        {
-                            var slide = _presentation.SlideShowWindow.View.Slide;
-
-                            foreach (Shape shape in slide.Shapes)
-                            {
-                                if (_originalShapes.ContainsKey(shape.Name))
-                                {
-                                    // Restaurar tamanho e posição originais
-                                    var original = _originalShapes[shape.Name];
-                                    shape.Width = original.Width;
-                                    shape.Height = original.Height;
-                                    shape.Left = original.Left;
-                                    shape.Top = original.Top;
-                                }
-                            }
-
-                            return "Zoom revertido.";
-                        }
-                    case "show_elapsed_time":
-                        return GetElapsedTime();
-
-                    default:
-                        return "Comando não reconhecido.";
-                }
+                // Close the WebSocket when done
+                await client.CloseAsync(WebSocketCloseStatus.NormalClosure, "Connection closed", CancellationToken.None);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error processing command: {ex.Message}");
-                return "Error processing command.";
+                Console.WriteLine($"WebSocket connection error: {ex.Message}");
+            }
+        }
+
+        Console.WriteLine("Initializing PowerPoint...");
+        Application pptApp = new Application();
+        _presentation = pptApp.Presentations.Open(
+            @"C:\Users\Asus\OneDrive - Universidade de Aveiro\LEI - Sara Almeida\4ºano\IM\IM_Projects\PowerPointVoiceApp\ConsoleApp\IM First Presentation.pptx",
+            Mso.MsoTriState.msoTrue,
+            Mso.MsoTriState.msoFalse,
+            Mso.MsoTriState.msoTrue);
+
+        Console.WriteLine("Running slideshow...");
+        _presentation.SlideShowSettings.Run();
+    }
+    private static async Task SendMessage(ClientWebSocket client, string message)
+    {
+        byte[] buffer = Encoding.UTF8.GetBytes(message);
+        await client.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
+        Console.WriteLine($"Sent message: {message}");
+    }
+
+    static async Task ProcessMessages(ClientWebSocket client)
+    {
+
+        byte[] buffer = new byte[1024];
+
+
+        while (client.State == WebSocketState.Open)
+        {
+            WebSocketReceiveResult result = await client.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
+            if (result.MessageType == WebSocketMessageType.Text)
+            {
+                string message = Encoding.UTF8.GetString(buffer, 0, result.Count);
+
+                if (message == "OK")
+                {
+                    Console.WriteLine("Received message OK: " + message);
+                }
+                else if (message != null && message != "RENEW")
+                {
+                    //Console.WriteLine("Received message: " + message);
+
+                    var doc = XDocument.Parse(message);
+                    var com = doc.Descendants("command").FirstOrDefault().Value;
+                    dynamic messageJSON = JsonConvert.DeserializeObject(com);
+
+                    Console.WriteLine(messageJSON);
+
+                    //Console.WriteLine(messageJSON["nlu"] == null ? "Sim" : "Nao");
+
+                    // Only process the message if there is something in the nlu parameter 
+                    // To resolve the runtime error 
+                    if (messageJSON["nlu"] != null)
+                    {
+                        Console.WriteLine(messageJSON["nlu"]);
+
+                        string intent = (string)messageJSON["nlu"]["intent"];
+
+                        if (intent == "next_slide")
+                        {
+                            _presentation.SlideShowWindow.View.Next();
+                            await SendMessage(client, messageMMI("Avançando para o próximo slide."));
+
+                        }
+                    }
+                    else
+                    {
+                        await SendMessage(client, messageMMI("Não entendi. Repita por favor !"));
+                    }
+                }
             }
         }
     }
 
-    public class VoiceCommand
+    public static string messageMMI(string msg)
     {
-        public string Intent { get; set; }
-        public string SlideTitle { get; set; } // For jump_to_slide_by_title
-        public string SlideNumber { get; set; }  // For jump_to_slide_by_number
-        public string Phrase { get; set; } // For highlight_phrase
+        return "<mmi:mmi xmlns:mmi=\"http://www.w3.org/2008/04/mmi-arch\" mmi:version=\"1.0\">" +
+                    "<mmi:startRequest mmi:context=\"ctx-1\" mmi:requestId=\"text-1\" mmi:source=\"APPSPEECH\" mmi:target=\"IM\">" +
+                        "<mmi:data>" +
+                            "<emma:emma xmlns:emma=\"http://www.w3.org/2003/04/emma\" emma:version=\"1.0\">" +
+                                "<emma:interpretation emma:confidence=\"1\" emma:id=\"text-\" emma:medium=\"text\" emma:mode=\"command\" emma:start=\"0\">" +
+                                    "<command>\"&lt;speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.w3.org/2001/10/synthesis http://www.w3.org/TR/speech-synthesis/synthesis.xsd\" xml:lang=\"pt-PT\"&gt;&lt;p&gt;" + msg + "&lt;/p&gt;&lt;/speak&gt;\"</command>" +
+                                "</emma:interpretation>" +
+                                "</emma:emma>" +
+                        "</mmi:data>" +
+                    "</mmi:startRequest>" +
+                "</mmi:mmi>";
     }
 }

@@ -1,24 +1,27 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controlo de Slides por Voz</title>
+    <meta charset="utf-8">
+    <title>CASA VIVA + Assistant</title>
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+
     <style>
         body {
             --indicator-color: black;
             background: #fff; /*radial-gradient(#fff 75%, var(--indicator-color));*/
             min-height: 100vh;
             color: burlywood;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 20px;
+            font-family: Poppins;
+            margin: 0;
+            padding: 0;
         }
 
         .mic {
             width: 150px;
-            margin: 20px auto;
         }
 
         .container {
@@ -30,321 +33,10 @@
             background-color: #f0f0f0;
         }
 
-        .bottomNav {
-            position: absolute;
-            bottom: 2%;
-            width: 95%;
-        }
-
-        .recognized {
-            font-size: x-large;
-        }
-
-        h1 {
-            color: #4CAF50;
-        }
-
-        p {
-            font-size: 1.2em;
-            color: #333;
-        }
-
-        #status {
-            margin-top: 20px;
-            padding: 10px;
-            border: 2px solid #2196F3;
-            background-color: #fff;
-            color: #2196F3;
-            display: inline-block;
-            font-size: 1em;
-        }
-
         .responseText {
-            margin-top: 20px;
-            font-size: 1em;
             border: solid 2px #8ea7cf;
             margin: 2%;
-            color: #4F5D73;
-            border: 1px solid #ccc;
-            padding: 10px;
-            display: inline-block;
-        }
-
-        #version-info {
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #666;
-        }
-
-
-    </style>
-</head>
-<body>
-    <h1>Controlo de Slides por Voz</h1>
-    <p>Diga "Próximo slide" ou "Slide anterior" para controlar a apresentação.</p>
-    <div id="version-info">Versão do PowerPoint: Carregando...</div>
-    <div id="status">Iniciando reconhecimento de voz...</div>
-    <div class="responseText" id="response">Bem-vindo ao Assistente!</div>
-    <div id="elapsed-time" class="responseText">Tempo decorrido: 0 segundos</div
-
-    <div>
-        <svg class="mic" id="mic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="32" fill="#4CAF50" />
-        </svg>
-    </div>
-
-    <script>
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'pt-PT';
-
-        const testUtterance = new SpeechSynthesisUtterance("Teste de síntese de fala");
-        testUtterance.lang = 'pt-PT';
-        window.speechSynthesis.speak(testUtterance);
-
-
-        const statusDiv = document.getElementById('status');
-        const responseDiv = document.getElementById('response');
-        const micCircle = document.querySelector('#mic circle');
-
-        function log(message) {
-            console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
-        }
-
-        //recognition.onresult = async (event) => {
-
-        //    if (isSpeaking || cooldown) {
-        //        log('Ignorando comando devido ao cooldown ou fala em andamento.');
-        //        return;
-        //    }
-
-        //    const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-        //    log(`Comando reconhecido: ${command}`);
-        //    statusDiv.textContent = `Comando reconhecido: ${command}`;
-
-        //    cooldown = true;
-        //    setTimeout(() => cooldown = false, 3000);
-
-        //    try {
-        //        const response = await fetch('http://localhost:5005/model/parse', {
-        //            method: 'POST',
-        //            headers: { 'Content-Type': 'application/json' },
-        //            body: JSON.stringify({ text: command }),
-        //        });
-
-        //        if (response.ok) {
-        //            const data = await response.json();
-        //            const intent = data.intent.name;
-        //            const confidence = data.intent.confidence;
-        //            log(`Intent: ${intent}, Confiança: ${confidence}`);
-
-        //            if (intent === 'fallback' || confidence < 0.6) {
-        //                responseDiv.textContent = 'Comando não reconhecido. Tente novamente.';
-        //                speak('Desculpe, não percebi o que disse. Pode repetir?');
-        //                log('Fallback acionado.');
-        //            } else {
-        //                switch (intent) {
-        //                    case 'next_slide':
-        //                        sendVoiceCommand('next_slide', 'Passando para o próximo slide.');
-        //                        break;
-        //                    case 'previous_slide':
-        //                        sendVoiceCommand('previous_slide', 'Voltando ao slide anterior.');
-        //                        break;
-        //                    default:
-        //                        responseDiv.textContent = 'Comando não reconhecido.';
-        //                        log('Intent não reconhecida.');
-        //                        break;
-        //                }
-        //            }
-        //        } else {
-        //            responseDiv.textContent = 'Erro ao processar o comando.';
-        //            log('Erro no servidor RASA.');
-        //        }
-        //    } catch (error) {
-        //        log(`Erro na comunicação com o RASA: ${error}`);
-        //        responseDiv.textContent = 'Erro na comunicação com o servidor.';
-        //    }
-        //};
-
-
-        //function sendVoiceCommand(intent, feedback) {
-        //    fetch('http://localhost:5000/api/voice-command/', {
-        //        method: 'POST',
-        //        headers: { 'Content-Type': 'application/json' },
-        //        body: JSON.stringify({ Intent: intent }),
-        //    }).then(() => {
-        //        responseDiv.textContent = feedback;
-        //        speak(feedback);
-        //        log(`Comando enviado: ${intent} - ${feedback}`);
-        //    }).catch(error => {
-        //        log(`Erro ao enviar comando: ${error}`);
-        //    });
-        //}
-
-        let isSpeaking = false;
-        let cooldown = false;
-
-        recognition.onstart = () => {
-            console.log('Reconhecimento de voz iniciado.');
-            statusDiv.textContent = 'Ouvindo comandos...';
-            micCircle.setAttribute('fill', '#00e676');
-        };
-
-        recognition.onresult = async (event) => {
-            if (isSpeaking || cooldown) {
-                console.log('Ignorando comando devido ao cooldown ou fala em andamento.');
-                return;
-            }
-
-            const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-            console.log(`[${new Date().toLocaleTimeString()}] Comando reconhecido: ${command}`);
-            statusDiv.textContent = `Comando reconhecido: ${command}`;
-
-            cooldown = true;
-            setTimeout(() => (cooldown = false), 2000); // Reduzir cooldown para evitar bloqueios
-
-            try {
-                const response = await fetch('http://localhost:5005/model/parse', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: command }),
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const intent = data.intent.name;
-                    const confidence = data.intent.confidence;
-                    console.log(`[${new Date().toLocaleTimeString()}] Intent: ${intent}, Confiança: ${confidence}`);
-
-                    if (confidence < 0.4) {
-                        console.log('Confiança muito baixa. Comando ignorado.');
-                        return;
-                    }
-
-                    if (intent === 'fallback' || confidence < 0.6) {
-                        responseDiv.textContent = 'Comando não reconhecido. Tente novamente.';
-                        speak('Desculpe, não percebi o que disse. Pode repetir?');
-                    } else {
-                        handleIntent(intent, data.entities || []);
-                    }
-                } else {
-                    console.error('Erro no servidor NLU.');
-                    responseDiv.textContent = 'Erro ao processar o comando.';
-                }
-            } catch (error) {
-                console.error(`Erro na comunicação com o servidor NLU: ${error}`);
-                responseDiv.textContent = 'Erro na comunicação com o servidor.';
-            }
-        };
-
-        function handleIntent(intent, entities) {
-            switch (intent) {
-                case 'next_slide':
-                    sendVoiceCommand('next_slide', 'Passando para o próximo slide.');
-                    break;
-                case 'previous_slide':
-                    sendVoiceCommand('previous_slide', 'Voltando ao slide anterior.');
-                    break;
-                case 'jump_to_slide_by_title':
-                    const slideTitle = entities.find((e) => e.entity === 'slide_title')?.value || '';
-                    console.log(`Slide title extracted: ${slideTitle}`);
-                    if (slideTitle) {
-                        sendVoiceCommand('jump_to_slide_by_title', `Indo para o slide: ${slideTitle}`, { SlideTitle: slideTitle });
-                        console.log(`Command sent for slide title: ${slideTitle}`);
-                    } else {
-                        console.error('Slide title not extracted or is empty.');
-                        responseDiv.textContent = 'Título do slide não fornecido.';
-                    }
-                    break;
-                case 'jump_to_slide_by_number':
-                    const slideNumberEntity = entities.find((e) => e.entity === 'slide_number')?.value || '';
-                    const slideNumber = parseInt(slideNumberEntity, 10);
-                    if (slideNumber) {
-                        sendVoiceCommand('jump_to_slide_by_number', `Indo para o slide: ${slideNumber}`, { SlideNumber: `${slideNumber}` });
-                    } else {
-                        responseDiv.textContent = 'Número do slide não fornecido.';
-                    }
-                case "highlight_phrase":
-                    const phrase = entities.find((e) => e.entity === "phrase")?.value || "";
-                    if (phrase) {
-                        sendVoiceCommand("highlight_phrase", `Sublinhando a frase: ${phrase}`, { Phrase: phrase });
-                    } else {
-                        responseDiv.textContent = "Frase não fornecida.";
-                    }
-                    break;
-                case "zoom_in":
-                    sendVoiceCommand("zoom_in", "Aumentando o zoom e focando na imagem.");
-                    break;
-
-                case "zoom_out":
-                    sendVoiceCommand("zoom_out", "Reduzindo o zoom no slide.");
-                    break;
-
-                case "show_elapsed_time":
-                    sendVoiceCommand("show_elapsed_time", "A mostrar o tempo decorrido desde o início da apresentação.");
-                    break;
-
-                default:
-                    responseDiv.textContent = 'Comando não reconhecido.';
-                    console.log('Intent não reconhecida.');
-            }
-        }
-
-        recognition.onerror = (event) => {
-            console.error('Erro no reconhecimento de voz:', event.error);
-            statusDiv.textContent = `Erro no reconhecimento de voz: ${event.error}`;
-            micCircle.setAttribute('fill', '#ff5252');
-        };
-
-        recognition.onend = () => {
-            console.log('Reconhecimento de voz finalizado. Reiniciando...');
-            statusDiv.textContent = 'Reconhecimento de voz finalizado. Reiniciando...';
-            setTimeout(() => recognition.start(), 500); // Pequeno atraso para reiniciar
-        };
-
-        // Inicializar WebSocket
-        let socket;
-
-        function initializeWebSocket() {
-            socket = new WebSocket('ws://localhost:5000/');
-
-            socket.onopen = () => {
-                console.log('WebSocket conectado.');
-            };
-
-            <!DOCTYPE html>
-<html lang="pt-PT">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controlo de Slides por Voz</title>
-    <style>
-        body {
-            --indicator-color: black;
-            background: #fff; /*radial-gradient(#fff 75%, var(--indicator-color));*/
-            min-height: 100vh;
-            color: burlywood;
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 20px;
-        }
-
-        .mic {
-            width: 150px;
-            margin: 20px auto;
-        }
-
-        .container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            border-radius: 10px;
-            background-color: #f0f0f0;
+            color: #41683a;
         }
 
         .bottomNav {
@@ -356,412 +48,492 @@
         .recognized {
             font-size: x-large;
         }
-
-        h1 {
-            color: #4CAF50;
-        }
-
-        p {
-            font-size: 1.2em;
-            color: #333;
-        }
-
-        #status {
-            margin-top: 20px;
-            padding: 10px;
-            border: 2px solid #2196F3;
-            background-color: #fff;
-            color: #2196F3;
-            display: inline-block;
-            font-size: 1em;
-        }
-
-        .responseText {
-            margin-top: 20px;
-            font-size: 1em;
-            border: solid 2px #8ea7cf;
-            margin: 2%;
-            color: #4F5D73;
-            border: 1px solid #ccc;
-            padding: 10px;
-            display: inline-block;
-        }
-
-        #version-info {
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #666;
-        }
-
-
     </style>
 </head>
 <body>
-    <h1>Controlo de Slides por Voz</h1>
-    <p>Diga "Próximo slide" ou "Slide anterior" para controlar a apresentação.</p>
-    <div id="version-info">Versão do PowerPoint: Carregando...</div>
-    <div id="status">Iniciando reconhecimento de voz...</div>
-    <div class="responseText" id="response">Bem-vindo ao Assistente!</div>
-    <div id="elapsed-time" class="responseText">Tempo decorrido: 0 segundos</div
+    <h1 style="background-color: #4F5D73; margin: 0;">CASA VIVA + Assistant</h1>
+    <!-- <p>Click the button below and start speaking.</p>
+     <button id="start-btn">Start</button>
+     -->
 
-    <div>
-        <svg class="mic" id="mic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="32" fill="#4CAF50" />
-        </svg>
+
+
+
+
+
+    <div class="bottomNav">
+        <div id="response" class="" style="">d</div>
+        <div class="container" style="border: solid 2px #4F5D73;margin: 2%;">
+
+            <svg class="mic" id="mic" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                 viewBox="0 0 100 100" style="enable-background:new 0 0 100 100;" xml:space="preserve">
+            <style type="text/css">
+                .st01 {
+                    fill: #4F5D73;
+                }
+
+                .st1 {
+                    opacity: 0.2;
+                }
+
+                .st2 {
+                    fill: #231F20;
+                }
+
+                .st3 {
+                    fill: #4F5D73;
+                }
+
+                .st4 {
+                    fill: #FFFFFF;
+                }
+</style>
+            <defs>
+            <filter id="f1" x="0" y="0">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="1" />
+         </filter>
+       </defs>
+            <circle class="st0" cx="50" cy="50" r="32" />
+            <g id="Layer_1" transform="translate(18,18)">
+            <g class="st1">
+            <path class="st2" d="M32,41.5c3.3,0,6-2.7,6-6v-18c0-3.3-2.7-6-6-6s-6,2.7-6,6v18C26,38.8,28.7,41.5,32,41.5z" />
+         </g>
+            <g class="st1">
+            <path class="st2" d="M32,48.2c-7.2,0-13-5.8-13-13v-3.8c0-0.8,0.7-1.5,1.5-1.5s1.5,0.7,1.5,1.5v3.8c0,5.5,4.5,10,10,10
+               s10-4.5,10-10v-3.8c0-0.8,0.7-1.5,1.5-1.5s1.5,0.7,1.5,1.5v3.8C45,42.4,39.2,48.2,32,48.2z" />
+         </g>
+            <g class="st1">
+            <path class="st2" d="M32,55c-0.8,0-1.5-0.7-1.5-1.5v-6c0-0.8,0.7-1.5,1.5-1.5s1.5,0.7,1.5,1.5v6C33.5,54.3,32.8,55,32,55z" />
+         </g>
+            <g class="st1">
+            <path class="st2" d="M37,56H27c-0.8,0-1.5-0.7-1.5-1.5S26.2,53,27,53h10c0.8,0,1.5,0.7,1.5,1.5S37.8,56,37,56z" />
+         </g>
+            <path class="st3" d="M32,39.5c3.3,0,6-2.7,6-6v-18c0-3.3-2.7-6-6-6s-6,2.7-6,6v18C26,36.8,28.7,39.5,32,39.5z" />
+            <path class="st4" d="M32,46.2c-7.2,0-13-5.8-13-13v-3.8c0-0.8,0.7-1.5,1.5-1.5s1.5,0.7,1.5,1.5v3.8c0,5.5,4.5,10,10,10
+             s10-4.5,10-10v-3.8c0-0.8,0.7-1.5,1.5-1.5s1.5,0.7,1.5,1.5v3.8C45,40.4,39.2,46.2,32,46.2z" />
+            <path class="st4" d="M32,53c-0.8,0-1.5-0.7-1.5-1.5v-6c0-0.8,0.7-1.5,1.5-1.5s1.5,0.7,1.5,1.5v6C33.5,52.3,32.8,53,32,53z" />
+            <path class="st4" d="M37,54H27c-0.8,0-1.5-0.7-1.5-1.5S26.2,51,27,51h10c0.8,0,1.5,0.7,1.5,1.5S37.8,54,37,54z" />
+       </g>
+       </svg>
+
+            <div class="recognized" style="display: inline; vertical-align: center; top: auto;bottom: auto; width: 600px;" id="transcript"></div>
+
+        </div>
     </div>
 
-    <script>
+
+
+    <div id="energy"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@latest/dist/svg.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.7/dist/bundle.min.js"></script>
+    <script src="js/mmi.js"></script>
+    <script src="js/globals.js"></script>
+    <script src="js/jquery-3.6.4.min.js"></script>
+    <script src="js/webtoolkit.utf8.js"></script>
+
+
+    <script type="text/javascript" src="js/recorder.js"></script>
+    <script type="text/javascript" src="js/microphone.js"></script>
+    <script type="text/javascript" src="kws__/edge-impulse-standalone.js"></script>
+    <script type="text/javascript" src="kws__/run-impulse.js"></script>
+
+    <script type="module">
+
+        var isOnKWS = false;
+        const sensor = new MicrophoneSensor();
+        let classifyCache = {};
+        let allData = [];
+        let allClassifications = [];
+        let casa_vivaStarted = null;
+
+        async function startkws() {
+            classifyCache = {};
+            allData = [];
+            allClassifications = [];
+            casa_vivaStarted = null;
+
+            isOnKWS = false;
+            //await sensor.takeSample(200, 16000, () => {});
+            sensor.takeSample(1000, 16000, () => { }).then(onSampleComplete);
+        }
+
+        setTimeout(function () {
+            classifyCache = {};
+            allData = [];
+            allClassifications = [];
+            casa_vivaStarted = null;
+        }, 60 * 60 * 1000);
+
+        const onSampleComplete = (obj) => {
+            if (!isOnKWS)
+                sensor.takeSample(500, 16000, () => { }).then(onSampleComplete);
+
+            allData = allData.concat(obj.values);
+            //console.log(Date.now(), 'allData is', allData.length / 16000, 'seconds');
+
+            const windowSize = 3 * 16000;
+            const windowStep = 0.5 * 16000;
+            const classifyWindowLength = 0.5 * 16000;
+            const classifyWindowOverlap = 0.25 * 16000;
+
+            // if we have at least one window of data...
+            if (allData.length >= windowSize) {
+                let window = allData.slice(allData.length - windowSize, allData.length);
+
+                let noiseCount = 0;
+                let casa_vivaCount = 0;
+                let uncertainCount = 0;
+
+                // in here we'll take 1 second slices, with 300 ms. overlap that we then classify (total 14 windows)
+                console.time('classifyWindow');
+                for (let wx = 0; wx <= windowSize - classifyWindowLength; wx += classifyWindowOverlap) {
+                    const cacheKey = allData.length - windowSize + wx;
+
+                    let classifyResult;
+                    if (!classifyCache[cacheKey]) {
+                        let slice = window.slice(wx, wx + classifyWindowLength);
+
+                        classifyCache[cacheKey] = classifier.classify(slice, false);
+                    }
+
+                    classifyResult = classifyCache[cacheKey];
+                    let noise = classifyResult.results.find(r => r.label === 'noise').value;
+                    let casa_viva = classifyResult.results.find(r => r.label === 'casa_viva').value;
+
+                    if (casa_viva > .3)
+                        console.log(casa_viva);
+                    if (noise >= 0.6) {
+                        noiseCount++;
+                    }
+                    else if (casa_viva >= 0.6) {
+                        casa_vivaCount++;
+
+                        if (!isOnKWS) {
+                            recognition.start();
+                            circle.animate(20, 0, 'now').attr({ fill: '#00a431' });
+                            transcriptDiv.textContent = "...";
+                            isOnKWS = true;
+                        }
+
+                    }
+                    else {
+                        uncertainCount++;
+                    }
+                }
+            }
+            //console.timeEnd('classifyWindow');
+        };
+
+        async function InitializeKWS() {
+            const classifier = window.classifier = new EdgeImpulseClassifier();
+            await classifier.init();
+            await sensor.init();
+            if (!sensor.hasSensor()) {
+                alert('Your device does not seem to have a microphone');
+            }
+            // start up the sensor
+            //await sensor.takeSample(200, 16000, () => {});
+
+            // then take 1s of data
+            sensor.takeSample(500, 16000, () => { }).then(onSampleComplete);
+        };
+        //InitializeKWS();
+
+
+        import { interpolateGreens } from "https://cdn.skypack.dev/d3-scale-chromatic@3"
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
         recognition.continuous = false;
-        recognition.interimResults = false;
+        recognition.interimResults = true;
         recognition.lang = 'pt-PT';
 
-        const testUtterance = new SpeechSynthesisUtterance("Teste de síntese de fala");
-        testUtterance.lang = 'pt-PT';
-        window.speechSynthesis.speak(testUtterance);
+
+        var circle = SVG.find('.st0');//.fill('#ccc');
+        const startBtn = document.getElementById('start-btn');
+        const transcriptDiv = document.getElementById('transcript');
+        const energyDiv = document.getElementById('energy');
+
+        var firstSent = "Diga 'Casa Viva' para comecar a falar.";
+        transcriptDiv.textContent = firstSent;
+        var resetfunc;
 
 
-        const statusDiv = document.getElementById('status');
-        const responseDiv = document.getElementById('response');
-        const micCircle = document.querySelector('#mic circle');
-
-        function log(message) {
-            console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
-        }
-
-        //recognition.onresult = async (event) => {
-
-        //    if (isSpeaking || cooldown) {
-        //        log('Ignorando comando devido ao cooldown ou fala em andamento.');
-        //        return;
-        //    }
-
-        //    const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-        //    log(`Comando reconhecido: ${command}`);
-        //    statusDiv.textContent = `Comando reconhecido: ${command}`;
-
-        //    cooldown = true;
-        //    setTimeout(() => cooldown = false, 3000);
-
-        //    try {
-        //        const response = await fetch('http://localhost:5005/model/parse', {
-        //            method: 'POST',
-        //            headers: { 'Content-Type': 'application/json' },
-        //            body: JSON.stringify({ text: command }),
-        //        });
-
-        //        if (response.ok) {
-        //            const data = await response.json();
-        //            const intent = data.intent.name;
-        //            const confidence = data.intent.confidence;
-        //            log(`Intent: ${intent}, Confiança: ${confidence}`);
-
-        //            if (intent === 'fallback' || confidence < 0.6) {
-        //                responseDiv.textContent = 'Comando não reconhecido. Tente novamente.';
-        //                speak('Desculpe, não percebi o que disse. Pode repetir?');
-        //                log('Fallback acionado.');
-        //            } else {
-        //                switch (intent) {
-        //                    case 'next_slide':
-        //                        sendVoiceCommand('next_slide', 'Passando para o próximo slide.');
-        //                        break;
-        //                    case 'previous_slide':
-        //                        sendVoiceCommand('previous_slide', 'Voltando ao slide anterior.');
-        //                        break;
-        //                    default:
-        //                        responseDiv.textContent = 'Comando não reconhecido.';
-        //                        log('Intent não reconhecida.');
-        //                        break;
-        //                }
-        //            }
-        //        } else {
-        //            responseDiv.textContent = 'Erro ao processar o comando.';
-        //            log('Erro no servidor RASA.');
-        //        }
-        //    } catch (error) {
-        //        log(`Erro na comunicação com o RASA: ${error}`);
-        //        responseDiv.textContent = 'Erro na comunicação com o servidor.';
-        //    }
-        //};
-
-
-        //function sendVoiceCommand(intent, feedback) {
-        //    fetch('http://localhost:5000/api/voice-command/', {
-        //        method: 'POST',
-        //        headers: { 'Content-Type': 'application/json' },
-        //        body: JSON.stringify({ Intent: intent }),
-        //    }).then(() => {
-        //        responseDiv.textContent = feedback;
-        //        speak(feedback);
-        //        log(`Comando enviado: ${intent} - ${feedback}`);
-        //    }).catch(error => {
-        //        log(`Erro ao enviar comando: ${error}`);
-        //    });
-        //}
-
-        let isSpeaking = false;
-        let cooldown = false;
-
-        recognition.onstart = () => {
-            console.log('Reconhecimento de voz iniciado.');
-            statusDiv.textContent = 'Ouvindo comandos...';
-            micCircle.setAttribute('fill', '#00e676');
+        recognition.onerror = function (event) {
+            console.error("REC ERROR" + event.error);
+            transcriptDiv.innerHTML = firstSent;
+            circle.animate(20, 0, 'now').attr({ fill: '#000' });
+        //    startkws();
         };
 
-        recognition.onresult = async (event) => {
-            if (isSpeaking || cooldown) {
-                console.log('Ignorando comando devido ao cooldown ou fala em andamento.');
+        recognition.onresult = function (event) {
+            speechActive = false;
+            var interim_transcript = '';
+            var final_transcript = '';
+
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    //if(event.results[i][0].confidence>0.6)
+                    energyDiv.textContent += event.results[i][0].confidence;
+                    {
+                        final_transcript = "";
+                        console.log("++" + event.results[i][0].transcript + "++");
+                        final_transcript = event.results[i][0].transcript.trim();
+                        /*var sentence = event.results[i][0].transcript.trim().toLowerCase();
+                        if(sentence.startsWith("casa viva") || sentence.startsWith("viva") || sentence.startsWith("aviva") || sentence.startsWith("sa viva") || sentence.startsWith("da viva") ||sentence.startsWith("ora viva"))
+                        {
+                          var indSent = sentence.indexOf("viva");
+                          final_transcript= sentence.slice(indSent+5);
+                        }*/
+                    }
+
+                    if (final_transcript.length > 2) {
+                        final_transcript = final_transcript.charAt(0).toUpperCase() + final_transcript.slice(1);
+                        transcriptDiv.innerHTML = "<span style='color:#00b44e'><b>" + final_transcript + "</b></span>";
+
+                        sendMMI(final_transcript);
+                        circle.animate(20, 0, 'now').attr({ fill: '#000' });
+                    //    startkws();
+                    } else {
+                        transcriptDiv.innerHTML = "<span style='color:#ff9494'><b>Desculpe nao consegui ententer.</b></span>";
+                    }
+
+                    //resetfunc = setTimeout(function () {
+                    //    transcriptDiv.innerHTML = firstSent;
+                    //}, 3000);
+
+                    speechActive = false;
+                } else {
+                    //if(event.results[i][0].confidence>0.6)
+                    {
+                        console.log(event.results[i][0].transcript + " -- " + i);
+                        var sentence = event.results[i][0].transcript.trim().toLowerCase();
+                        /*if(sentence.startsWith("casa viva") || sentence.startsWith("viva") || sentence.startsWith("aviva") || sentence.startsWith("sa viva") || sentence.startsWith("da viva") ||sentence.startsWith("ora viva") ){
+                          var indSent = sentence.indexOf("viva");
+                          final_transcript= sentence.slice(indSent+5);
+                        }*/
+
+                    }
+                    transcriptDiv.textContent = event.results[i][0].transcript.trim().toLowerCase();
+                }
+            }
+        };
+
+        // Click mic to start voice recognition !!
+        $(".mic").on('click', function () {
+            recognition.start();
+            console.log("Start voice recognition");
+        })
+
+
+        var vadActive = false;
+        var speechActive = false;
+
+        async function main() {
+            const myvad = await vad.MicVAD.new({
+
+                onSpeechEnd: (audio) => {
+                    // do something with `audio` (Float32Array of audio samples at sample rate 16000)...
+                    //transcriptDiv.textContent += "-";
+                    vadActive = false;
+                    setTimeout(function () {
+                        if (speechActive) recognition.stop();
+                        speechActive = false;
+                    }, 3000);
+                },
+                onSpeechStart: () => {
+                    //transcriptDiv.textContent += " ->";
+                    if (!speechActive) {
+                        speechActive = true;
+                        recognition.start();
+                        transcriptDiv.textContent = "...";
+                    }
+                    clearTimeout(resetfunc);
+                    vadActive = true;
+                },
+                onFrameProcessed: (probs) => {
+                    if (vadActive || speechActive) {
+                        const indicatorColor = interpolateGreens(probs.isSpeech / 1.5);
+                        //circle.fill(indicatorColor);
+                        circle.animate(20, 0, 'now').attr({ fill: indicatorColor });
+                    }
+                    //    energyDiv.textContent = probs.isSpeech + "--" + probs.notSpeech;
+                    //document.body.style.setProperty("--indicator-color", indicatorColor)
+                },
+            })
+            //myvad.start()
+        }
+        //main()
+
+        if ('speechSynthesis' in window) {
+            console.log('Your browser <strong>supports</strong> speech synthesis.');
+        }
+
+        var ttsSpeaker;
+        window.speechSynthesis.onvoiceschanged = function (e) {
+            var voices = speechSynthesis.getVoices();
+            ttsSpeaker = voices[0];
+            for (let i = 0; i < voices.length; i++) {
+                if (voices[i].lang == "pt-PT") {
+                    console.log(voices[i]);
+                    if (voices[i].name.includes("Duarte")) ttsSpeaker = voices[i];
+                }
+
+
+            }
+
+            console.log(ttsSpeaker);
+        };
+
+        function speak(text) {
+
+            var msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+
+            // Set the attributes.
+            msg.volume = parseFloat(1);
+            msg.rate = parseFloat(1.1);
+            msg.pitch = parseFloat(1);
+
+            msg.voice = ttsSpeaker;
+
+            window.speechSynthesis.speak(msg);
+        }
+        /////////////////////////////////////////
+
+
+        var mmiCli_1 = null;
+        mmiCli_1 = new MMIClient(null, mmi_fusion + "SPEECHIN");
+
+
+
+
+        function sendMMI(final_transcript) {
+
+            var obj = new Object();
+            obj.text = final_transcript;
+            $.post("http://localhost:5005/model/parse", JSON.stringify(obj), function (data) {
+                console.log(data);
+
+                var message;
+
+                switch (data.intent.name) {
+                    case ('next_slide'):
+                        message = { 'intent': 'next_slide' };
+                        break;
+
+
+                    case ('change_color'):
+                        var shape = '';
+                        var color = '';
+
+                        for (let i = 0; i < data.entities.length; i++) {
+                            if (data.entities[i].entity == 'shape') { 
+                                shape = data.entities[i].value;
+                            }
+                            if (data.entities[i].entity == 'color') {
+                                color = data.entities[i].value;
+                            }
+                        }
+
+                        message = { 'intent': 'change_color', 'shape': shape, 'color': color }
+                        break;
+
+                    default:
+                        console.warn("Intent not recognized: ", data.intent.name);
+                        return; // Exit if intent is not recognized
+                }
+
+                var messaget = btoa(unescape(encodeURIComponent(final_transcript)));
+                var result = { "recognized": ["SPEECH", "SPEECHIN", "APP"], "text": messaget, "nlu": message };
+                mmiCli_1.sendToIM(new LifeCycleEvent("SPEECHIN", "IM", "text-1", "ctx-1").
+                    doExtensionNotification(new EMMA("text-", "text", "command", 1, 0).
+                        setValue(JSON.stringify(result))));
+                });
+            }
+
+                    /*
+
+                              */
+        // sendMMI("mudar para azul o circulo");
+
+
+        var mmiCli_Out_add = "wss://"+host+":8005/IM/USER1/";
+        var mmiCli_Out = null;
+        mmiCli_Out = new MMIClientSocket(mmiCli_Out_add + "SPEECHOUT");
+        mmiCli_Out.onMessage.on(im1MessageHandler);
+        mmiCli_Out.onOpen.on(socketOpenHandler);
+        mmiCli_Out.openSocket();
+
+
+        function socketOpenHandler(event) {
+            console.log("---------------openSocketHandler---------------")
+
+            if (mmiCli_Out.socket.readyState !== WebSocket.OPEN) {
                 return;
             }
+        }
 
-            const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-            console.log(`[${new Date().toLocaleTimeString()}] Comando reconhecido: ${command}`);
-            statusDiv.textContent = `Comando reconhecido: ${command}`;
+        function im1MessageHandler(data) {
 
-            cooldown = true;
-            setTimeout(() => (cooldown = false), 2000); // Reduzir cooldown para evitar bloqueios
+            console.log("--------------im1MessageHandler---------------");
 
-            try {
-                const response = await fetch('http://localhost:5005/model/parse', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: command }),
-                });
+            if (data != null && data != "RENEW" && data != "OK") {
 
-                if (response.ok) {
-                    const data = await response.json();
-                    const intent = data.intent.name;
-                    const confidence = data.intent.confidence;
-                    console.log(`[${new Date().toLocaleTimeString()}] Intent: ${intent}, Confiança: ${confidence}`);
+                console.log(data);
 
-                    if (confidence < 0.4) {
-                        console.log('Confiança muito baixa. Comando ignorado.');
-                        return;
+                var content = $(data).find("emma\\:interpretation").first().text().trim();
+
+                if (typeof content == 'string') {
+                    try {
+                        // Try to parse XML
+                        var xml = $.parseXML(content.replace(/\\"/g, "\"").slice(1, -1));
+
+                        // Extract sentence
+                        let text = $(xml).find("p").text();
+                        //let text = Utf8.decode(atob(sentence.slice(2,-1)));
+
+                        console.log(text);
+                        speak(text);
+
+                        $("#response").html(text);
+                        $("#response").addClass("container");
+                        $("#response").addClass("responseText");
+
+                        setTimeout(function () {
+                            $("#response").html("");
+                            $("#response").removeClass("container");
+                            $("#response").removeClass("responseText");
+                        }, 3000);
+
                     }
+                    catch (e) { console.log(e); }
 
-                    if (intent === 'fallback' || confidence < 0.6) {
-                        responseDiv.textContent = 'Comando não reconhecido. Tente novamente.';
-                        speak('Desculpe, não percebi o que disse. Pode repetir?');
-                    } else {
-                        handleIntent(intent, data.entities || []);
-                    }
-                } else {
-                    console.error('Erro no servidor NLU.');
-                    responseDiv.textContent = 'Erro ao processar o comando.';
                 }
-            } catch (error) {
-                console.error(`Erro na comunicação com o servidor NLU: ${error}`);
-                responseDiv.textContent = 'Erro na comunicação com o servidor.';
-            }
-        };
-
-        function handleIntent(intent, entities) {
-            switch (intent) {
-                case 'next_slide':
-                    sendVoiceCommand('next_slide', 'Passando para o próximo slide.');
-                    break;
-                case 'previous_slide':
-                    sendVoiceCommand('previous_slide', 'Voltando ao slide anterior.');
-                    break;
-                case 'jump_to_slide_by_title':
-                    const slideTitle = entities.find((e) => e.entity === 'slide_title')?.value || '';
-                    console.log(`Slide title extracted: ${slideTitle}`);
-                    if (slideTitle) {
-                        sendVoiceCommand('jump_to_slide_by_title', `Indo para o slide: ${slideTitle}`, { SlideTitle: slideTitle });
-                        console.log(`Command sent for slide title: ${slideTitle}`);
-                    } else {
-                        console.error('Slide title not extracted or is empty.');
-                        responseDiv.textContent = 'Título do slide não fornecido.';
-                    }
-                    break;
-                case 'jump_to_slide_by_number':
-                    const slideNumberEntity = entities.find((e) => e.entity === 'slide_number')?.value || '';
-                    const slideNumber = parseInt(slideNumberEntity, 10);
-                    if (slideNumber) {
-                        sendVoiceCommand('jump_to_slide_by_number', `Indo para o slide: ${slideNumber}`, { SlideNumber: `${slideNumber}` });
-                    } else {
-                        responseDiv.textContent = 'Número do slide não fornecido.';
-                    }
-                case "highlight_phrase":
-                    const phrase = entities.find((e) => e.entity === "phrase")?.value || "";
-                    if (phrase) {
-                        sendVoiceCommand("highlight_phrase", `Sublinhando a frase: ${phrase}`, { Phrase: phrase });
-                    } else {
-                        responseDiv.textContent = "Frase não fornecida.";
-                    }
-                    break;
-                case "zoom_in":
-                    sendVoiceCommand("zoom_in", "Aumentando o zoom e focando na imagem.");
-                    break;
-
-                case "zoom_out":
-                    sendVoiceCommand("zoom_out", "Reduzindo o zoom no slide.");
-                    break;
-
-                case "show_elapsed_time":
-                    sendVoiceCommand("show_elapsed_time", "A mostrar o tempo decorrido desde o início da apresentação.");
-                    break;
-
-                default:
-                    responseDiv.textContent = 'Comando não reconhecido.';
-                    console.log('Intent não reconhecida.');
             }
         }
 
-        recognition.onerror = (event) => {
-            console.error('Erro no reconhecimento de voz:', event.error);
-            statusDiv.textContent = `Erro no reconhecimento de voz: ${event.error}`;
-            micCircle.setAttribute('fill', '#ff5252');
-        };
+        var mmiCli_1 = null;
+        mmiCli_1 = new MMIClient(null, "https://" + host + ":8000/IM/USER1/APPSPEECH")
 
-        recognition.onend = () => {
-            console.log('Reconhecimento de voz finalizado. Reiniciando...');
-            statusDiv.textContent = 'Reconhecimento de voz finalizado. Reiniciando...';
-            setTimeout(() => recognition.start(), 500); // Pequeno atraso para reiniciar
-        };
-
-        // Inicializar WebSocket
-        let socket;
-
-        function initializeWebSocket() {
-            socket = new WebSocket('ws://localhost:5000/');
-
-            socket.onopen = () => {
-                console.log('WebSocket conectado.');
-            };
-
-            socket.onmessage = (event) => {
-                console.log('Resposta do servidor WebSocket:', event.data);
-
-                try {
-                    // Verifica se a mensagem é JSON
-                    const response = JSON.parse(event.data);
-
-                    if (response.Intent === "show_elapsed_time") {
-                        document.getElementById('elapsed-time').textContent = `Tempo decorrido: ${response.Message}`;
-                    } else {
-                        responseDiv.textContent = response.Message;
-                    }
-                } catch (error) {
-                    // Mensagens que não são JSON
-                    console.error("Erro ao processar a resposta do WebSocket como JSON. Tratando como texto simples.", error);
-                    if (event.data.startsWith("Tempo decorrido")) {
-                        document.getElementById('elapsed-time').textContent = event.data;
-                    } else {
-                        responseDiv.textContent = event.data;
-                    }
-                }
-            };
-
-            socket.onerror = (error) => {
-                console.error('Erro no WebSocket:', error);
-            };
-
-            socket.onclose = () => {
-                console.log('WebSocket desconectado. Tentando reconectar em 5 segundos...');
-                setTimeout(initializeWebSocket, 5000); // Tenta reconectar
-            };
+        function sendToVoice(texto) {
+            //let speak = "&lt;speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.w3.org/2001/10/synthesis http://www.w3.org/TR/speech-synthesis/synthesis.xsd\" xml:lang=\"pt-PT\"&gt;&lt;p&gt;" + "quadrado" + "&lt;/p&gt;&lt;/speak&gt";
+            let speak = "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.w3.org/2001/10/synthesis http://www.w3.org/TR/speech-synthesis/synthesis.xsd\" xml:lang=\"pt-PT\"><p>" + texto + "</p></speak>";
+            var result = speak;
+            mmiCli_1.sendToIM(new LifeCycleEvent("APPSPEECH", "IM", "text-1", "ctx-1").
+                doStartRequest(new EMMA("text-", "text", "command", 1, 0).
+                    setValue(JSON.stringify(result))));
         }
 
-        function sendVoiceCommand(intent, feedback, additionalData = {}) {
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                const message = JSON.stringify({ Intent: intent, ...additionalData });
-                console.log(`Payload sent to WebSocket: ${message}`); // Debug log
-                //if (SlideNumber) {
-                //    console.log(`Payload sent to WebSocket: ${JSON.stringify({ Intent: intent, SlideNumber: additionalData?.slideNumber })}`);
-                //}
-                //if (SlideTitle) {
-                //    console.log(`Sending payload: ${JSON.stringify({ Intent: intent, SlideTitle: slideTitle })}`);
-                //}
-                socket.send(message);
-                console.log(`Comando enviado: ${intent}`);
-                responseDiv.textContent = feedback;
-                speak(feedback);
-            } else {
-                console.error('WebSocket não está conectado.');
-                responseDiv.textContent = 'Erro: WebSocket desconectado.';
-            }
-        }
-
-        function speak(text) {
-            console.log(`Attempting to speak: ${text}`); // Debug log
-            if ('speechSynthesis' in window) {
-                const msg = new SpeechSynthesisUtterance(text);
-                msg.lang = 'pt-PT'; // Adjust the language code as needed
-                msg.onend = () => {
-                    console.log('Resposta falada concluída.');
-                };
-                window.speechSynthesis.speak(msg);
-                console.log(`Resposta falada: ${text}`);
-            } else {
-                console.error('SpeechSynthesis não é suportado neste navegador.');
-                responseDiv.textContent = 'Erro ao fornecer feedback auditivo.';
-            }
-        }
+        /////////////////////////////////////////
 
 
-        // Initialize WebSocket
-        initializeWebSocket();
-
-        recognition.start(); // Start listening for commands
+        // sendMMI("Ligar as luzes")
     </script>
-</body>
-</html>
 
 
-            socket.onerror = (error) => {
-                console.error('Erro no WebSocket:', error);
-            };
 
-            socket.onclose = () => {
-                console.log('WebSocket desconectado. Tentando reconectar em 5 segundos...');
-                setTimeout(initializeWebSocket, 5000); // Tenta reconectar
-            };
-        }
-
-        function sendVoiceCommand(intent, feedback, additionalData = {}) {
-            if (socket && socket.readyState === WebSocket.OPEN) {
-                const message = JSON.stringify({ Intent: intent, ...additionalData });
-                console.log(`Payload sent to WebSocket: ${message}`); // Debug log
-                //if (SlideNumber) {
-                //    console.log(`Payload sent to WebSocket: ${JSON.stringify({ Intent: intent, SlideNumber: additionalData?.slideNumber })}`);
-                //}
-                //if (SlideTitle) {
-                //    console.log(`Sending payload: ${JSON.stringify({ Intent: intent, SlideTitle: slideTitle })}`);
-                //}
-                socket.send(message);
-                console.log(`Comando enviado: ${intent}`);
-                responseDiv.textContent = feedback;
-                speak(feedback);
-            } else {
-                console.error('WebSocket não está conectado.');
-                responseDiv.textContent = 'Erro: WebSocket desconectado.';
-            }
-        }
-
-        function speak(text) {
-            console.log(`Attempting to speak: ${text}`); // Debug log
-            if ('speechSynthesis' in window) {
-                const msg = new SpeechSynthesisUtterance(text);
-                msg.lang = 'pt-PT'; // Adjust the language code as needed
-                msg.onend = () => {
-                    console.log('Resposta falada concluída.');
-                };
-                window.speechSynthesis.speak(msg);
-                console.log(`Resposta falada: ${text}`);
-            } else {
-                console.error('SpeechSynthesis não é suportado neste navegador.');
-                responseDiv.textContent = 'Erro ao fornecer feedback auditivo.';
-            }
-        }
-
-
-        // Initialize WebSocket
-        initializeWebSocket();
-
-        recognition.start(); // Start listening for commands
-    </script>
 </body>
 </html>

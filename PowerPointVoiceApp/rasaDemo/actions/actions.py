@@ -1,186 +1,130 @@
+# This files contains your custom actions which can be used to run
+# custom Python code.
+#
+# See this guide on how to implement these action:
+# https://rasa.com/docs/rasa/custom-actions
+
+
+# This is a simple example for a custom action which utters "Hello World!"
+
+# from typing import Any, Text, Dict, List
+#
+# from rasa_sdk import Action, Tracker
+# from rasa_sdk.executor import CollectingDispatcher
+#
+#
+# class ActionHelloWorld(Action):
+#
+#     def name(self) -> Text:
+#         return "action_hello_world"
+#
+#     def run(self, dispatcher: CollectingDispatcher,
+#             tracker: Tracker,
+#             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+#
+#         dispatcher.utter_message(text="Hello World!")
+#
+#         return []
+
 from typing import Any, Text, Dict, List
+
 from rasa_sdk import Action, Tracker
 from rasa_sdk.executor import CollectingDispatcher
-import win32com.client
+from rasa_sdk.events import SlotSet, UserUtteranceReverted
 
-import requests
-import websocket
-import json 
+import json
 
-class ActionNextSlide(Action):
+
+def write_log(text):
+    with open("log.txt", "a") as log:
+        log.write(text)
+
+class ActionDefaultFallback(Action):
+    """Executes the fallback action and goes back to the previous state
+    of the dialogue"""
+
     def name(self) -> Text:
-        return "action_next_slide"
+        return "action_default_fallback"
 
-    def run(self, dispatcher: CollectingDispatcher, tracker, domain):
-        # Send POST to PowerPoint server
-        response = requests.post(
-            "http://localhost:5000/api/voice-command/",
-            json={"intent": "next_slide"}
-        )
+    async def run(
+        self,
+        dispatcher: CollectingDispatcher,
+        tracker: Tracker,
+        domain: Dict[Text, Any],
+    ) -> List[Dict[Text, Any]]:
+        write_log("Actions: " + "No_understand: " + "enter\n")
+        
+        print("Confiança: ", tracker.latest_message["intent"].get("confidence"))
+        write_log("Confiança: " + str(tracker.latest_message["intent"].get("confidence")) + "\n")
+        
+        if tracker.latest_message["intent"].get("confidence") > 0.5:
+            dispatcher.utter_message(response="utter_default")
+        
+        #publish.single(topic="comandos/voz/UI", payload=json.dumps({"comando": "no_understand"}), hostname="localhost")
+        
+        write_log("Actions: " + "No_understand: " + "exit\n")
+        
+        # Revert user message which led to fallback.
+        return [UserUtteranceReverted()]
 
-        if response.status_code == 200:
-            dispatcher.utter_message(text="Passando para o próximo slide.")
-        else:
-            dispatcher.utter_message(text="Erro ao comunicar com o servidor PowerPoint.")
-        return []
-
-
-
-class ActionPreviousSlide(Action):
+class SwitchLightsAction(Action):
     def name(self) -> Text:
-        return "action_previous_slide"
-
+        return "action_switch_lights"
+   
     def run(self, dispatcher: CollectingDispatcher,
-            tracker: Dict[Text, Any],
+            tracker: Tracker,
             domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        try:
-            pptApp = win32com.client.Dispatch("PowerPoint.Application")
-            if pptApp.SlideShowWindows.Count > 0:
-                pptApp.SlideShowWindows(1).View.Previous()
-                dispatcher.utter_message(text="Voltando para o slide anterior.")
-            else:
-                dispatcher.utter_message(text="Nenhuma apresentação está em execução.")
-        except Exception as e:
-            dispatcher.utter_message(text=f"Erro ao voltar para o slide anterior: {e}")
-        return []
+       
+        print(tracker.get_slot("switch") + "--" + tracker.get_slot("place"))   
+        #tracker.lastest_message["entities"]  [0] - entity - value
+        print("Confiança: ", tracker.latest_message["intent"].get("confidence"))          
+        if tracker.latest_message["intent"].get("confidence") < 0.8:
+            dispatcher.utter_message(response="utter_default")
+            return [UserUtteranceReverted()]
+        """
+        switcher = homecontrol.SwitchLights(lightsimulator)
+        message = switcher.switchlight(tracker.get_slot("switch"), tracker.get_slot("place"))
+        dispatcher.utter_message(message)
+        return [SlotSet("place", None), SlotSet("switch", None)]
+         """
 
-class ActionJumpToSlideByTitle(Action):
+class ActionAfirmar(Action):
+    
     def name(self) -> Text:
-        return "action_jump_to_slide_by_title"
-
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        slide_title = tracker.get_slot("slide_title")
-        print(f"Slide Title received from slot: {slide_title}")
-        if not slide_title:  # Validação
-            dispatcher.utter_message(text="Não encontrei um título válido.")
-            return []
-        print(f"Slide Title received: {slide_title}")
-        if slide_title:
-            try:
-                ws = websocket.create_connection("ws://localhost:5000/")
-                command = {"Intent": "jump_to_slide_by_title", "SlideTitle": slide_title}
-                ws.send(json.dumps(command))
-                ws.close()
-                dispatcher.utter_message(text=f"Indo para o slide com o título: {slide_title}.")
-            except Exception as e:
-                print(f"Error sending WebSocket message: {e}")
-                dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
-        else:
-            dispatcher.utter_message(text="Não encontrei um título válido.")
+        return "action_afirmar"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        write_log("Actions: " + "Afirmar: " + "enter\n")
+        print("Confiança: ", tracker.latest_message["intent"].get("confidence"))
+        write_log("Confiança: " + str(tracker.latest_message["intent"].get("confidence")) + "\n")
+        
+        msg = {"comando": "confirmar"}
+    #    publish.single(topic="comandos/voz/UI", payload=json.dumps(msg), hostname="localhost")
+        
+        write_log("Actions: " + "Afirmar: " + "exit\n")
+        
         return []
 
-class ActionJumpToSlideByNumber(Action):
+class ActionNegar(Action):
+    
     def name(self) -> Text:
-        return "action_jump_to_slide_by_number"
-
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-            slide_number = tracker.get_slot("slide_number")
-
-            if slide_number:
-                try:
-                    slide_number = int(slide_number)  # Ensure it's a valid number
-                    dispatcher.utter_message(text=f"Indo para o slide número {slide_number}.")
-
-                    # Send WebSocket command
-                    import websocket
-                    ws = websocket.create_connection("ws://localhost:5000/")
-                    command = {"Intent": "jump_to_slide_by_number", "SlideNumber": slide_number}
-                    ws.send(json.dumps(command))
-                    ws.close()
-                except ValueError:
-                    dispatcher.utter_message(text="O número do slide fornecido não é válido.")
-            else:
-                dispatcher.utter_message(text="Nenhum número de slide fornecido.")
-
-            return []
-
-class ActionHighlightPhrase(Action):
-    def name(self) -> Text:
-        return "action_highlight_phrase"
-
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        phrase = tracker.get_slot("phrase")
-        if not phrase:
-            dispatcher.utter_message(text="Não encontrei a frase que pediu para sublinhar.")
-            return []
-
-        try:
-            # Conectar ao WebSocket para enviar o comando
-            ws = websocket.create_connection("ws://localhost:5000/")
-            command = {"Intent": "highlight_phrase", "Phrase": phrase}
-            print(f"Sending WebSocket payload: {command}")  # Debug log
-            ws.send(json.dumps(command))
-            ws.close()
-
-            dispatcher.utter_message(text=f"Sublinhando a frase: {phrase}.")
-        except Exception as e:
-            print(f"Error in highlight phrase WebSocket: {e}")
-            dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
-
+        return "action_negar"
+    
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        
+        write_log("Actions: " + "Negar: " + "enter\n")
+        print("Confiança: ", tracker.latest_message["intent"].get("confidence"))
+        write_log("Confiança: " + str(tracker.latest_message["intent"].get("confidence")) + "\n")
+        
+        msg = {"comando": "negar"}
+        #publish.single(topic="comandos/voz/UI", payload=json.dumps(msg), hostname="localhost")
+        
+        write_log("Actions: " + "Negar: " + "exit\n")
+        
         return []
-
-class ActionZoomIn(Action):
-    def name(self) -> Text:
-        return "action_zoom_in"
-
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        try:
-            ws = websocket.create_connection("ws://localhost:5000/")
-            command = {"Intent": "zoom_in"}
-            ws.send(json.dumps(command))
-            ws.close()
-
-            dispatcher.utter_message(text="Zoom aumentado e focado no slide.")
-        except Exception as e:
-            dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
-
-        return []
-
-class ActionZoomOut(Action):
-    def name(self) -> Text:
-        return "action_zoom_out"
-
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        try:
-            ws = websocket.create_connection("ws://localhost:5000/")
-            command = {"Intent": "zoom_out"}
-            ws.send(json.dumps(command))
-            ws.close()
-
-            dispatcher.utter_message(text="Zoom reduzido no slide.")
-        except Exception as e:
-            dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
-
-        return []
-
-class ActionShowElapsedTime(Action):
-    def name(self) -> Text:
-        return "action_show_elapsed_time"
-
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
-        try:
-            # Conectar ao WebSocket para enviar o comando
-            ws = websocket.create_connection("ws://localhost:5000/")
-            command = {"Intent": "show_elapsed_time"}
-            ws.send(json.dumps(command))
-            
-            # Receber a resposta
-            response = ws.recv()
-            ws.close()
-
-            dispatcher.utter_message(text=response)
-        except Exception as e:
-            dispatcher.utter_message(text=f"Erro ao calcular o tempo decorrido: {e}")
-
-        return []
-
-
-class ActionDebugVoice(Action):
-    def name(self) -> str:
-        return "action_debug_voice"
-
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict) -> List[Dict]:
-        user_message = tracker.latest_message.get("text", "")
-        dispatcher.utter_message(text=f"You said: {user_message}")
-        return []
-
+    

@@ -15,13 +15,9 @@ rules:
   steps:
   - intent: jump_to_slide_by_title
   - action: utter_confirm_title
-  - intent: jump_to_slide_by_title
-  - action: utter_confirm_title
 
 - rule: Handle jump to slide by number
   steps:
-  - intent: jump_to_slide_by_number
-  - action: utter_confirm_number
   - intent: jump_to_slide_by_number
   - action: utter_confirm_number
  
@@ -29,20 +25,14 @@ rules:
   steps:
   - intent: highlight_phrase
   - action: utter_highlight_phrase
-  - intent: highlight_phrase
-  - action: utter_highlight_phrase
   
 - rule: Handle zoom in
   steps:
   - intent: zoom_in
   - action: utter_zoom_in
-  - intent: zoom_in
-  - action: utter_zoom_in
 
 - rule: Handle zoom out
   steps:
-  - intent: zoom_out
-  - action: utter_zoom_out
   - intent: zoom_out
   - action: utter_zoom_out
 

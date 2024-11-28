@@ -50,6 +50,10 @@ class ActionJumpToSlideByTitle(Action):
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         slide_title = tracker.get_slot("slide_title")
+        print(f"Slide Title received from slot: {slide_title}")
+        if not slide_title:  # Validação
+            dispatcher.utter_message(text="Não encontrei um título válido.")
+            return []
         print(f"Slide Title received: {slide_title}")
         if slide_title:
             try:
@@ -59,6 +63,7 @@ class ActionJumpToSlideByTitle(Action):
                 ws.close()
                 dispatcher.utter_message(text=f"Indo para o slide com o título: {slide_title}.")
             except Exception as e:
+                print(f"Error sending WebSocket message: {e}")
                 dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
         else:
             dispatcher.utter_message(text="Não encontrei um título válido.")
@@ -79,7 +84,7 @@ class ActionJumpToSlideByNumber(Action):
                     # Send WebSocket command
                     import websocket
                     ws = websocket.create_connection("ws://localhost:5000/")
-                    command = {"Intent": "jump_to_slide", "SlideNumber": slide_number}
+                    command = {"Intent": "jump_to_slide_by_number", "SlideNumber": slide_number}
                     ws.send(json.dumps(command))
                     ws.close()
                 except ValueError:
@@ -103,11 +108,13 @@ class ActionHighlightPhrase(Action):
             # Conectar ao WebSocket para enviar o comando
             ws = websocket.create_connection("ws://localhost:5000/")
             command = {"Intent": "highlight_phrase", "Phrase": phrase}
+            print(f"Sending WebSocket payload: {command}")  # Debug log
             ws.send(json.dumps(command))
             ws.close()
 
             dispatcher.utter_message(text=f"Sublinhando a frase: {phrase}.")
         except Exception as e:
+            print(f"Error in highlight phrase WebSocket: {e}")
             dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
 
         return []
@@ -118,18 +125,16 @@ class ActionZoomIn(Action):
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         try:
-            # Send WebSocket command for Zoom In
             ws = websocket.create_connection("ws://localhost:5000/")
             command = {"Intent": "zoom_in"}
             ws.send(json.dumps(command))
             ws.close()
 
-            dispatcher.utter_message(text="Ampliando a imagem ou forma no slide atual.")
+            dispatcher.utter_message(text="Zoom aumentado e focado no slide.")
         except Exception as e:
             dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
 
         return []
-
 
 class ActionZoomOut(Action):
     def name(self) -> Text:
@@ -137,19 +142,37 @@ class ActionZoomOut(Action):
 
     def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
         try:
-            # Send WebSocket command for Zoom Out
             ws = websocket.create_connection("ws://localhost:5000/")
             command = {"Intent": "zoom_out"}
             ws.send(json.dumps(command))
             ws.close()
 
-            dispatcher.utter_message(text="Restaurando a imagem ou forma ao tamanho original.")
+            dispatcher.utter_message(text="Zoom reduzido no slide.")
         except Exception as e:
             dispatcher.utter_message(text=f"Erro ao comunicar com o servidor: {e}")
 
         return []
 
+class ActionShowElapsedTime(Action):
+    def name(self) -> Text:
+        return "action_show_elapsed_time"
 
+    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:
+        try:
+            # Conectar ao WebSocket para enviar o comando
+            ws = websocket.create_connection("ws://localhost:5000/")
+            command = {"Intent": "show_elapsed_time"}
+            ws.send(json.dumps(command))
+            
+            # Receber a resposta
+            response = ws.recv()
+            ws.close()
+
+            dispatcher.utter_message(text=response)
+        except Exception as e:
+            dispatcher.utter_message(text=f"Erro ao calcular o tempo decorrido: {e}")
+
+        return []
 
 
 class ActionDebugVoice(Action):

@@ -146,6 +146,7 @@
 //    }
 //}
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
@@ -161,6 +162,8 @@ namespace PowerPointWebSocketControl
     internal class Program
     {
         private static Presentation _presentation;
+        private static Dictionary<string, (float Width, float Height, float Left, float Top)> _originalShapes = new Dictionary<string, (float, float, float, float)>();
+        private static DateTime _startTime;
 
         static async Task Main(string[] args)
         {
@@ -175,6 +178,7 @@ namespace PowerPointWebSocketControl
                 Mso.MsoTriState.msoTrue);
 
             _presentation.SlideShowSettings.Run();
+            _startTime = DateTime.Now;
 
             // Start WebSocket Server
             HttpListener listener = new HttpListener();
@@ -200,6 +204,11 @@ namespace PowerPointWebSocketControl
             }
         }
 
+        private static string GetElapsedTime()
+        {
+            TimeSpan elapsedTime = DateTime.Now - _startTime;
+            return $"Tempo decorrido: {elapsedTime.Hours} horas, {elapsedTime.Minutes} minutos e {elapsedTime.Seconds} segundos.";
+        }
 
         private static void HandleCors(HttpListenerResponse response)
         {
@@ -255,6 +264,9 @@ namespace PowerPointWebSocketControl
                     return "Invalid command.";
                 }
 
+                Console.WriteLine($"Raw WebSocket message received: {message}");
+                Console.WriteLine($"Received Intent: {command.Intent} with additional data: {message}");
+
                 switch (command.Intent.ToLower())
                 {
                     case "next_slide":
@@ -269,7 +281,7 @@ namespace PowerPointWebSocketControl
                         if (!string.IsNullOrEmpty(command.SlideTitle))
                         {
                             string normalizedTitle = command.SlideTitle.Trim();
-                            Console.WriteLine($"Received SlideTitle: {normalizedTitle}"); 
+                            Console.WriteLine($"Received SlideTitle: {normalizedTitle}");
                             foreach (Slide slide in _presentation.Slides)
                             {
                                 if (slide.Shapes.HasTitle == Mso.MsoTriState.msoTrue &&
@@ -301,6 +313,7 @@ namespace PowerPointWebSocketControl
                     case "highlight_phrase":
                         if (!string.IsNullOrEmpty(command.Phrase))
                         {
+                            Console.WriteLine($"Phrase to highlight: {command.Phrase}");
                             string phraseToHighlight = command.Phrase.Trim();
                             foreach (Slide slide in _presentation.Slides)
                             {
@@ -315,49 +328,77 @@ namespace PowerPointWebSocketControl
                                             TextRange foundText = shape.TextFrame.TextRange.Characters(startIndex + 1, phraseToHighlight.Length);
                                             foundText.Font.Bold = Mso.MsoTriState.msoTrue;
                                             foundText.Font.Underline = Mso.MsoTriState.msoTrue;
+                                            Console.WriteLine($"Phrase '{phraseToHighlight}' highlighted.");
                                             return $"Sublinhando a frase: {phraseToHighlight}.";
                                         }
                                     }
                                 }
                             }
+                            Console.WriteLine($"Phrase '{command.Phrase}' not found.");
                             return $"A frase '{command.Phrase}' não foi encontrada em nenhum slide.";
                         }
                         return "Frase não fornecida.";
 
                     case "zoom_in":
                         {
-                            foreach (Slide slide in _presentation.Slides)
+                            var slide = _presentation.SlideShowWindow.View.Slide;
+                            Shape focusShape = null;
+                            float maxArea = 0;
+
+                            foreach (Shape shape in slide.Shapes)
                             {
-                                foreach (Shape shape in slide.Shapes)
+                                if (shape.Type == Mso.MsoShapeType.msoPicture || shape.Type == Mso.MsoShapeType.msoAutoShape)
                                 {
-                                    if (shape.Type == Mso.MsoShapeType.msoPicture || shape.Type == Mso.MsoShapeType.msoAutoShape)
+                                    float area = shape.Width * shape.Height;
+                                    if (area > maxArea)
                                     {
-                                        shape.Width *= 1.5f; // Aumenta 50% do tamanho
-                                        shape.Height *= 1.5f;
-                                        return "Zoom aplicado à imagem.";
+                                        maxArea = area;
+                                        focusShape = shape;
+                                    }
+
+                                    // Armazena os tamanhos e posições originais, se ainda não estiverem salvos
+                                    if (!_originalShapes.ContainsKey(shape.Name))
+                                    {
+                                        _originalShapes[shape.Name] = (shape.Width, shape.Height, shape.Left, shape.Top);
                                     }
                                 }
                             }
-                            return "Nenhuma imagem encontrada para ampliar.";
+
+                            if (focusShape != null)
+                            {
+                                // Ampliar e centralizar
+                                focusShape.Width *= 1.5f;
+                                focusShape.Height *= 1.5f;
+                                focusShape.Left = (_presentation.PageSetup.SlideWidth - focusShape.Width) / 2;
+                                focusShape.Top = (_presentation.PageSetup.SlideHeight - focusShape.Height) / 2;
+
+                                return $"Simulando zoom na área principal: {focusShape.Name}.";
+                            }
+
+                            return "Nenhuma área principal foi encontrada no slide para aplicar zoom.";
                         }
 
                     case "zoom_out":
                         {
-                            foreach (Slide slide in _presentation.Slides)
+                            var slide = _presentation.SlideShowWindow.View.Slide;
+
+                            foreach (Shape shape in slide.Shapes)
                             {
-                                foreach (Shape shape in slide.Shapes)
+                                if (_originalShapes.ContainsKey(shape.Name))
                                 {
-                                    if (shape.Type == Mso.MsoShapeType.msoPicture || shape.Type == Mso.MsoShapeType.msoAutoShape)
-                                    {
-                                        shape.Width /= 1.5f; // Reduz 50% do tamanho
-                                        shape.Height /= 1.5f;
-                                        return "Zoom revertido ao tamanho original.";
-                                    }
+                                    // Restaurar tamanho e posição originais
+                                    var original = _originalShapes[shape.Name];
+                                    shape.Width = original.Width;
+                                    shape.Height = original.Height;
+                                    shape.Left = original.Left;
+                                    shape.Top = original.Top;
                                 }
                             }
-                            return "Nenhuma imagem encontrada para reduzir.";
-                        }
 
+                            return "Zoom revertido.";
+                        }
+                    case "show_elapsed_time":
+                        return GetElapsedTime();
 
                     default:
                         return "Comando não reconhecido.";

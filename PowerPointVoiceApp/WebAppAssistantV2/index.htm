@@ -85,6 +85,7 @@
     <div id="version-info">Versão do PowerPoint: Carregando...</div>
     <div id="status">Iniciando reconhecimento de voz...</div>
     <div class="responseText" id="response">Bem-vindo ao Assistente!</div>
+    <div id="elapsed-time" class="responseText">Tempo decorrido: 0 segundos</div
 
     <div>
         <svg class="mic" id="mic" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
@@ -112,7 +113,6 @@
         function log(message) {
             console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
         }
-
 
         //recognition.onresult = async (event) => {
 
@@ -221,7 +221,7 @@
 
                     if (confidence < 0.4) {
                         console.log('Confiança muito baixa. Comando ignorado.');
-                        return; 
+                        return;
                     }
 
                     if (intent === 'fallback' || confidence < 0.6) {
@@ -250,9 +250,12 @@
                     break;
                 case 'jump_to_slide_by_title':
                     const slideTitle = entities.find((e) => e.entity === 'slide_title')?.value || '';
+                    console.log(`Slide title extracted: ${slideTitle}`);
                     if (slideTitle) {
                         sendVoiceCommand('jump_to_slide_by_title', `Indo para o slide: ${slideTitle}`, { SlideTitle: slideTitle });
+                        console.log(`Command sent for slide title: ${slideTitle}`);
                     } else {
+                        console.error('Slide title not extracted or is empty.');
                         responseDiv.textContent = 'Título do slide não fornecido.';
                     }
                     break;
@@ -272,6 +275,18 @@
                         responseDiv.textContent = "Frase não fornecida.";
                     }
                     break;
+                case "zoom_in":
+                    sendVoiceCommand("zoom_in", "Aumentando o zoom e focando na imagem.");
+                    break;
+
+                case "zoom_out":
+                    sendVoiceCommand("zoom_out", "Reduzindo o zoom no slide.");
+                    break;
+
+                case "show_elapsed_time":
+                    sendVoiceCommand("show_elapsed_time", "A mostrar o tempo decorrido desde o início da apresentação.");
+                    break;
+
                 default:
                     responseDiv.textContent = 'Comando não reconhecido.';
                     console.log('Intent não reconhecida.');
@@ -302,7 +317,25 @@
 
             socket.onmessage = (event) => {
                 console.log('Resposta do servidor WebSocket:', event.data);
-                responseDiv.textContent = event.data;
+
+                try {
+                    // Verifica se a mensagem é JSON
+                    const response = JSON.parse(event.data);
+
+                    if (response.Intent === "show_elapsed_time") {
+                        document.getElementById('elapsed-time').textContent = `Tempo decorrido: ${response.Message}`;
+                    } else {
+                        responseDiv.textContent = response.Message;
+                    }
+                } catch (error) {
+                    // Mensagens que não são JSON
+                    console.error("Erro ao processar a resposta do WebSocket como JSON. Tratando como texto simples.", error);
+                    if (event.data.startsWith("Tempo decorrido")) {
+                        document.getElementById('elapsed-time').textContent = event.data;
+                    } else {
+                        responseDiv.textContent = event.data;
+                    }
+                }
             };
 
             socket.onerror = (error) => {

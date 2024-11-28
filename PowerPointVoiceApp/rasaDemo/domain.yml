@@ -8,6 +8,7 @@ intents:
   - highlight_phrase
   - zoom_in
   - zoom_out
+  - show_elapsed_time
   - fallback
 
 entities:
@@ -18,14 +19,10 @@ entities:
 slots:
   slide_title:
     type: text
+    influence_conversation: false
     mappings:
       - type: from_entity
         entity: slide_title
-  phrase:
-    type: text
-    mappings:
-      - type: from_entity
-        entity: phrase
 
   slide_number:
     type: text
@@ -33,6 +30,12 @@ slots:
     mappings:
       - type: from_entity
         entity: slide_number
+
+  phrase:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: phrase
 
 responses:
   utter_next_slide:
@@ -60,10 +63,13 @@ responses:
     - text: "Não encontrei a frase que pediu para sublinhar."
   
   utter_zoom_in:
-    - text: "Zoom aplicado à imagem."
+    - text: "Aumentando o zoom no slide."
 
   utter_zoom_out:
-    - text: "Imagem revertida ao tamanho original."
+    - text: "Reduzindo o zoom no slide."
+  
+  utter_show_elapsed_time:
+    - text: "Calculando o tempo decorrido..."
 
   utter_default:
     - text: "Desculpe, não percebi o que disse. Pode repetir?"
@@ -71,8 +77,7 @@ responses:
 actions:
   - action_next_slide
   - action_previous_slide
-  - action_jump_to_slide_title 
-  - action_highlight_phrase
+  - action_show_elapsed_time
 
 
 session_config:

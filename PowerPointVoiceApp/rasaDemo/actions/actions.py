@@ -54,11 +54,12 @@ class ActionJumpToSlideByTitle(Action):
         if not slide_title:  # Validação
             dispatcher.utter_message(text="Não encontrei um título válido.")
             return []
-        print(f"Slide Title received: {slide_title}")
         if slide_title:
+            print(f"Slide Title received: {slide_title}")
             try:
                 ws = websocket.create_connection("ws://localhost:5000/")
                 command = {"Intent": "jump_to_slide_by_title", "SlideTitle": slide_title}
+               
                 ws.send(json.dumps(command))
                 ws.close()
                 dispatcher.utter_message(text=f"Indo para o slide com o título: {slide_title}.")

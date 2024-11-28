@@ -23,50 +23,20 @@ nlu:
  
   - intent: jump_to_slide_by_title
     examples: |
-      - Mostra-me o slide com o título [Resultados](slide_title), por favor
-      - Passando para o slide de [Resultados](slide_title)
-      - Passando para o slide do [Resultados](slide_title)
-      - Passando para o slide da [Resultados](slide_title)
-      - Passando para o slide dos [Resultados](slide_title)
-      - Passando para o slide das [Resultados](slide_title)
-      - Quero ver o slide [Agenda](slide_title), por favor
+      - Mostra-me o slide com o título [Resultados](slide_title)
+      - Quero ver o slide chamado [Agenda](slide_title)
       - Muda para o slide [Introdução](slide_title)
-      - Vai para o slide com o título [Introdução](slide_title)
-      - Vai para o slide de título [Introdução](slide_title)
-      - Gostava de ver o slide com o título [Agenda](slide_title)
-      - Quero saltar para o slide [Resultados](slide_title)
-      - Quero ir para o slide [Introdução](slide_title)
+      - Vai para o slide com o título [Conclusão](slide_title)
+      - Quero saltar para o slide [Metodologia](slide_title)
       - Mostra já o slide [Resultados](slide_title)
-      - Pode mostrar-me o slide [Agenda](slide_title)?
-      - Mostra o slide [Agenda](slide_title), por favor
-      - Salta para o slide [Resultados](slide_title)
-      - Tira-me deste slide e vai para o slide [Introdução](slide_title)
-      - Muda já para o slide [Resultados](slide_title)
-      - Slide com o título [Introdução](slide_title), por favor
-      - Passa já para o slide [Resultados](slide_title)
-      - Vai ao slide com o título [Agenda](slide_title)
-      - Avança para o slide [Agenda](slide_title)
+      - Passa já para o slide [Introdução](slide_title)
+      - Altere para o slide [Agenda](slide_title)
+      - Pode avançar para o slide [Conclusão](slide_title)?
+      - Gostava de ver o slide com o título [Resultados](slide_title)
+      - Por favor, passa ao slide [Introdução](slide_title)
+      - Salta para o slide [Agenda](slide_title)
       - Traz-me o slide [Resultados](slide_title)
-      - Quero o slide chamado [Introdução](slide_title)
-      - Dá-me o slide [Agenda](slide_title)
-      - Apresenta o slide [Resultados](slide_title)
-      - Mostra o slide chamado [Introdução](slide_title)
-      - Mostra a parte [Resultados](slide_title)
-      - Quero ver a parte do slide [Introdução](slide_title)
-      - Altera para o slide com o nome [Agenda](slide_title)
-      - Posso ver o slide [Resultados](slide_title)?
-      - Muda imediatamente para o slide [Introdução](slide_title)
-      - Slide [Agenda](slide_title), por favor
-      - Vai até o slide chamado [Resultados](slide_title)
-      - Posso ver o slide de título [Agenda](slide_title)?
-      - Troca para o slide [Introdução](slide_title)
-      - Muda para o slide com o nome [Resultados](slide_title)
-      - Gostava de ver o slide que tem o título [Agenda](slide_title)
-      - Pode avançar para o slide [Resultados](slide_title)?
-      - Por favor, passa ao slide com o título [Introdução](slide_title)
-      - Para o slide [Agenda](slide_title), por favor
-      - Troca já para o slide [Resultados](slide_title)
-
+      - Vai até o slide chamado [Metodologia](slide_title)
 
   - intent: jump_to_slide_by_number
     examples: |
@@ -78,16 +48,16 @@ nlu:
 
   - intent: highlight_phrase
     examples: |
-      - Sublinha a frase [Interação Multimodal](phrase)
-      - Quero destacar a frase [Controlo da apresentação por voz](phrase)
-      - Por favor, sublinhar [Interação Multimodal](phrase)
-      - Destaca a frase [Interação Multimodal](phrase)
-      - Realça a frase [Interação Multimodal](phrase)
-      - Realçar a frase [Controlo da apresentação por voz](phrase)
-      - Sublinha [Controlo da apresentação por voz](phrase)
-      - Quero sublinhar a frase [Interação Multimodal](phrase)
-      - Podes destacar a frase [Interação Multimodal](phrase)?
-      - Sublinha para mim a frase [Controlo da apresentação por voz](phrase)
+      - Destaca a frase [Apresentações são essenciais](phrase)
+      - Sublinha a frase [Processamento de linguagem natural](phrase)
+      - Quero sublinhar [Tecnologias utilizadas no projeto](phrase)
+      - Realça [Simples e intuitivos para apresentadores](phrase)
+      - Dá ênfase à frase [Objetivo do projeto é simplificar o processo](phrase)
+      - Pode sublinhar [Vantagens de usar o sistema](phrase)?
+      - Marque [Desafios enfrentados durante a implementação](phrase)
+      - Quero que destaque [Introdução do problema](phrase)
+      - Sublinha o texto [Resumo do sistema](phrase)
+      - Destaca [Passos futuros para o projeto](phrase)
 
   - intent: zoom_in
     examples: |

@@ -172,7 +172,7 @@ namespace PowerPointWebSocketControl
             // Initialize PowerPoint
             Application pptApp = new Application();
             _presentation = pptApp.Presentations.Open(
-                @"C:\Users\maria\Downloads\IM First Presentation.pptx",
+                @"C:\Users\maria\Downloads\IM Second Presentation.pptx",
                 Mso.MsoTriState.msoTrue,
                 Mso.MsoTriState.msoFalse,
                 Mso.MsoTriState.msoTrue);
@@ -264,7 +264,6 @@ namespace PowerPointWebSocketControl
                     return "Invalid command.";
                 }
 
-                Console.WriteLine($"Raw WebSocket message received: {message}");
                 Console.WriteLine($"Received Intent: {command.Intent} with additional data: {message}");
 
                 switch (command.Intent.ToLower())
@@ -278,6 +277,7 @@ namespace PowerPointWebSocketControl
                         return "Slide anterior.";
 
                     case "jump_to_slide_by_title":
+                        Console.WriteLine("entrou");
                         if (!string.IsNullOrEmpty(command.SlideTitle))
                         {
                             string normalizedTitle = command.SlideTitle.Trim();

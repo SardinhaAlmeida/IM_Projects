@@ -19,7 +19,7 @@ entities:
 slots:
   slide_title:
     type: text
-    influence_conversation: false
+    influence_conversation: true
     mappings:
       - type: from_entity
         entity: slide_title
@@ -77,8 +77,12 @@ responses:
 actions:
   - action_next_slide
   - action_previous_slide
+  - action_jump_to_slide_by_title
+  - action_jump_to_slide_by_number
+  - action_highlight_phrase
+  - action_zoom_in
+  - action_zoom_out
   - action_show_elapsed_time
-
 
 session_config:
   session_expiration_time: 60

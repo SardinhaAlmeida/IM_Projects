@@ -5,13 +5,64 @@ stories:
     steps:
       - intent: next_slide
       - action: utter_next_slide
-  
-  - story: Navigate to slide by title
+
+  - story: Navigate to previous slide
+    steps:
+      - intent: previous_slide
+      - action: utter_previous_slide
+
+  - story: Jump to slide by title
     steps:
       - intent: jump_to_slide_by_title
-      - action: utter_confirm_title
+        entities:
+          - slide_title: "Agenda"
+      - action: action_jump_to_slide_by_title
 
-  - story: Handle elapsed time
+  - story: Jump to slide by number
     steps:
-    - intent: show_elapsed_time
-    - action: action_show_elapsed_time
+      - intent: jump_to_slide_by_number
+        entities:
+          - slide_number: "3"
+      - action: action_jump_to_slide_by_number
+
+  - story: Highlight a phrase
+    steps:
+      - intent: highlight_phrase
+        entities:
+          - phrase: "Apresentacoes sao essenciais"
+      - action: action_highlight_phrase
+
+  - story: Zoom in on slide
+    steps:
+      - intent: zoom_in
+      - action: action_zoom_in
+
+  - story: Zoom out on slide
+    steps:
+      - intent: zoom_out
+      - action: action_zoom_out
+ 
+  - story: Perguntar slide atual
+    steps:
+      - intent: current_slide
+      - action: action_current_slide
+  
+  - story: helper command
+    steps:
+      - intent: helper
+      - action: action_helper
+  
+  - story: greet user
+    steps:
+      - intent: greet
+      - action: utter_greet
+
+  - story: user asks how are you
+    steps:
+      - intent: ask_how_are_you
+      - action: utter_ask_how_are_you
+
+  - story: user responds how they are
+    steps:
+      - intent: respond_how_am_i
+      - action: utter_respond_how_am_i

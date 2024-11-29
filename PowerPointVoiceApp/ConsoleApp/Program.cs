@@ -1,151 +1,4 @@
-﻿//using System;
-//using System.Net;
-//using System.Text.Json;
-//using Microsoft.Office.Interop.PowerPoint;
-//using Mso = Microsoft.Office.Core;
-
-//namespace PowerPointVoiceControl
-//{
-//    internal class Program
-//    {
-//        static void Main(string[] args)
-//        {
-//            // Configuração do PowerPoint
-
-
-//            Application pptApp = new Application();
-//            Presentation presentation = pptApp.Presentations.Open(
-//                @"C:\Users\Asus\OneDrive - Universidade de Aveiro\LEI - Sara Almeida\4ºano\IM\IM_Projects\PowerPointVoiceApp\ConsoleApp\IM First Presentation.pptx",
-//                Mso.MsoTriState.msoTrue,
-//                Mso.MsoTriState.msoFalse,
-//                Mso.MsoTriState.msoTrue);
-
-//            presentation.SlideShowSettings.Run();
-
-//            // Configuração do HttpListener
-//            HttpListener listener = new HttpListener();
-//            listener.Prefixes.Add("http://localhost:5000/api/voice-command/");
-//            listener.Start();
-//            Console.WriteLine("Servidor em execução...");
-//            while (true)
-//            {
-//                try
-//                {
-//                    var context = listener.GetContext();
-//                    var request = context.Request;
-
-//                    if (request.HttpMethod == "OPTIONS")
-//                    {
-//                        // Respond to CORS preflight requests
-//                        var response = context.Response;
-//                        AddCorsHeaders(response);
-//                        response.StatusCode = (int)HttpStatusCode.OK;
-//                        response.Close();
-//                        continue;
-//                    }
-
-//                    if (request.HttpMethod == "POST")
-//                    {
-//                        using (var reader = new System.IO.StreamReader(request.InputStream, request.ContentEncoding))
-//                        {
-//                            var body = reader.ReadToEnd();
-//                            VoiceCommand command;
-
-//                            try
-//                            {
-//                                command = JsonSerializer.Deserialize<VoiceCommand>(body);
-//                            }
-//                            catch (JsonException)
-//                            {
-//                                Console.WriteLine("Erro ao desserializar o comando.");
-//                                SendResponse(context.Response, "Formato JSON inválido.", HttpStatusCode.BadRequest);
-//                                continue;
-//                            }
-
-//                            if (command == null || string.IsNullOrEmpty(command.Intent))
-//                            {
-//                                Console.WriteLine("Comando vazio ou inválido recebido.");
-//                                SendResponse(context.Response, "Comando inválido.", HttpStatusCode.BadRequest);
-//                                continue;
-//                            }
-
-//                            string responseMessage = HandleCommand(command, presentation);
-//                            SendResponse(context.Response, responseMessage, HttpStatusCode.OK);
-//                        }
-//                    }
-//                    else
-//                    {
-//                        Console.WriteLine($"Método {request.HttpMethod} não suportado.");
-//                        SendResponse(context.Response, "Método não suportado.", HttpStatusCode.MethodNotAllowed);
-//                    }
-//                }
-//                catch (Exception ex)
-//                {
-//                    Console.WriteLine($"Erro no servidor: {ex.Message}");
-//                }
-//            }
-
-//        }
-
-//        private static void AddCorsHeaders(HttpListenerResponse response)
-//        {
-//            response.Headers.Add("Access-Control-Allow-Origin", "*");
-//            response.Headers.Add("Access-Control-Allow-Methods", "POST, OPTIONS");
-//            response.Headers.Add("Access-Control-Allow-Headers", "Content-Type");
-//        }
-
-//        private static void SendResponse(HttpListenerResponse response, string message, HttpStatusCode statusCode)
-//        {
-//            AddCorsHeaders(response);
-
-//            byte[] buffer = System.Text.Encoding.UTF8.GetBytes(message);
-//            response.StatusCode = (int)statusCode;
-//            response.ContentLength64 = buffer.Length;
-
-//            try
-//            {
-//                using (var output = response.OutputStream)
-//                {
-//                    output.Write(buffer, 0, buffer.Length);
-//                }
-//            }
-//            catch (Exception ex)
-//            {
-//                Console.WriteLine($"Erro ao enviar a resposta: {ex.Message}");
-//            }
-//        }
-
-
-
-//        private static string HandleCommand(VoiceCommand command, Presentation presentation)
-//        {
-//            if (command == null || string.IsNullOrEmpty(command.Intent))
-//            {
-//                return "Comando inválido.";
-//            }
-
-//            switch (command.Intent.ToLower())
-//            {
-//                case "next_slide":
-//                    presentation.SlideShowWindow.View.Next();
-//                    return "Próximo slide.";
-
-//                case "previous_slide":
-//                    presentation.SlideShowWindow.View.Previous();
-//                    return "Slide anterior.";
-
-//                default:
-//                    return "Comando não reconhecido.";
-//            }
-//        }
-//    }
-
-//    public class VoiceCommand
-//    {
-//        public string Intent { get; set; }
-//    }
-//}
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -255,16 +108,22 @@ namespace PowerPointWebSocketControl
 
         private static string HandleCommand(string message)
         {
+            Console.WriteLine($"Comando recebido no servidor: {message}");
+
             try
             {
                 // Parse the received message (assume it's JSON)
                 var command = JsonSerializer.Deserialize<VoiceCommand>(message);
                 if (command == null || string.IsNullOrEmpty(command.Intent))
                 {
+                    Console.WriteLine("Comando inválido ou nulo.");
                     return "Invalid command.";
                 }
 
                 Console.WriteLine($"Received Intent: {command.Intent} with additional data: {message}");
+
+                // Garante que a apresentação está em modo de exibição de slides
+                EnsureSlideShowView();
 
                 switch (command.Intent.ToLower())
                 {
@@ -400,6 +259,74 @@ namespace PowerPointWebSocketControl
                     case "show_elapsed_time":
                         return GetElapsedTime();
 
+                    // Video controls
+                    case "play_video":
+                        return ControlVideo("play");
+
+                    case "pause_video":
+                        return ControlVideo("pause");
+
+                    case "stop_video":
+                        return ControlVideo("stop");
+
+                    case "fast_forward_video":
+                        // Passe os segundos (use um valor padrão, como 10 segundos, se não for fornecido)
+                        int secondsToFastForward = command.Seconds > 0 ? command.Seconds : 10;
+                        return ControlVideo("fast_forward", secondsToFastForward);
+
+                    case "rewind_video":
+                        return ControlVideo("rewind");
+
+                    case "current_slide":
+                        return GetCurrentSlide();
+
+                    case "restart_presentation":
+                        if (_presentation?.SlideShowWindow != null)
+                        {
+                            _presentation.SlideShowWindow.View.GotoSlide(1);
+                            return "Apresentação reiniciada no primeiro slide.";
+                        }
+                        return "Nenhuma apresentação está em execução para reiniciar.";
+
+                    case "start_timer":
+                        _startTime = DateTime.Now; // Reinicia o temporizador com o horário atual
+                        Console.WriteLine("Temporizador iniciado.");
+                        return "Temporizador iniciado.";
+
+                    case "stop_timer":
+                        if (_startTime == default(DateTime))
+                        {
+                            Console.WriteLine("Nenhum temporizador ativo.");
+                            return "Nenhum temporizador está ativo.";
+                        }
+
+                        TimeSpan elapsed = DateTime.Now - _startTime; // Calcula o tempo decorrido
+                        _startTime = default(DateTime); // Reseta o temporizador
+                        Console.WriteLine("Temporizador parado.");
+                        return $"Temporizador parado. Tempo decorrido: {elapsed.Hours} horas, {elapsed.Minutes} minutos e {elapsed.Seconds} segundos.";
+
+                    case "helper":
+                        return "Aqui estão os comandos que pode usar: "
+                               + "- Próximo slide para avançar para o próximo slide. "
+                               + "- Slide anterior para voltar ao slide anterior. "
+                               + "- Reinicia a apresentação para reiniciar desde o primeiro slide. "
+                               + "- Em que slide estou? para verificar o slide atual. "
+                               + "- Inicia o temporizador para começar a cronometrar. "
+                               + "- Para o temporizador para parar o temporizador. "
+                               + "- Zoom in para ampliar no slide. "
+                               + "- Zoom out para reduzir no slide. "
+                               + "- Sublinhar frase para destacar uma frase no slide. "
+                               + "- Mostra tempo decorrido para exibir o tempo desde o início da apresentação.";
+
+                    case "greet":
+                        return "Olá! Como posso ajudar hoje?";
+
+                    case "ask_how_are_you":
+                        return "Estou ótimo, obrigado por perguntar! Como está você?";
+
+                    case "respond_how_am_i":
+                        return "Que bom ouvir isso! Estou aqui para o que precisar.";
+
                     default:
                         return "Comando não reconhecido.";
                 }
@@ -410,6 +337,88 @@ namespace PowerPointWebSocketControl
                 return "Error processing command.";
             }
         }
+
+        private static string GetCurrentSlide()
+        {
+            try
+            {
+                if (_presentation.SlideShowWindow != null)
+                {
+                    var currentSlideIndex = _presentation.SlideShowWindow.View.Slide.SlideIndex;
+                    Console.WriteLine($"Slide atual: {currentSlideIndex}");
+                    return $"Estás no slide número {currentSlideIndex}.";
+                }
+                else
+                {
+                    Console.WriteLine("Nenhuma apresentação está em execução.");
+                    return "Nenhuma apresentação está em execução.";
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao verificar o slide atual: {ex.Message}");
+                return "Erro ao verificar o slide atual.";
+            }
+        }
+
+
+        private static string ControlVideo(string action, int seconds = 0)
+        {
+            EnsureSlideShowView();
+
+            foreach (Slide slide in _presentation.Slides)
+            {
+                foreach (Shape shape in slide.Shapes)
+                {
+                    Console.WriteLine($"Verificando elemento: {shape.Name}, Tipo: {shape.Type}");
+
+                    // Verifique se a forma é de mídia
+                    if (shape.Type == Mso.MsoShapeType.msoMedia)
+                    {
+                        Console.WriteLine($"Elemento de vídeo encontrado: {shape.Name}");
+
+                        switch (action.ToLower())
+                        {
+                            case "play":
+                                shape.AnimationSettings.PlaySettings.PlayOnEntry = Mso.MsoTriState.msoTrue;
+                                shape.AnimationSettings.PlaySettings.LoopUntilStopped = Mso.MsoTriState.msoTrue;
+                                Console.WriteLine("Iniciando reprodução do vídeo.");
+                                return "Reproduzindo o vídeo.";
+
+                            case "pause":
+                                Console.WriteLine("Infelizmente, o PowerPoint Interop não suporta pausa diretamente.");
+                                return "Não é possível pausar o vídeo neste modo.";
+
+                            case "stop":
+                                shape.AnimationSettings.PlaySettings.StopAfterSlides = 1; // Para de reproduzir após o slide
+                                Console.WriteLine("Parando o vídeo.");
+                                return "Vídeo parado.";
+
+                            default:
+                                Console.WriteLine($"Ação '{action}' não reconhecida.");
+                                return "Ação não reconhecida.";
+                        }
+                    }
+                }
+            }
+
+            Console.WriteLine("Nenhum vídeo encontrado no slide atual.");
+            return "Nenhum vídeo encontrado no slide atual.";
+        }
+
+        private static void EnsureSlideShowView()
+        {
+            if (_presentation.SlideShowWindow == null)
+            {
+                Console.WriteLine("Modo de exibição de slides não encontrado. Iniciando...");
+                _presentation.SlideShowSettings.Run();
+            }
+            else
+            {
+                Console.WriteLine("Apresentação já está no modo de exibição de slides.");
+            }
+        }
+
     }
 
     public class VoiceCommand
@@ -418,5 +427,6 @@ namespace PowerPointWebSocketControl
         public string SlideTitle { get; set; } // For jump_to_slide_by_title
         public string SlideNumber { get; set; }  // For jump_to_slide_by_number
         public string Phrase { get; set; } // For highlight_phrase
+        public int Seconds { get; set; }
     }
 }

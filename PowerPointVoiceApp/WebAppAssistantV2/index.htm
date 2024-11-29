@@ -114,76 +114,6 @@
             console.log(`[${new Date().toLocaleTimeString()}] ${message}`);
         }
 
-        //recognition.onresult = async (event) => {
-
-        //    if (isSpeaking || cooldown) {
-        //        log('Ignorando comando devido ao cooldown ou fala em andamento.');
-        //        return;
-        //    }
-
-        //    const command = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
-        //    log(`Comando reconhecido: ${command}`);
-        //    statusDiv.textContent = `Comando reconhecido: ${command}`;
-
-        //    cooldown = true;
-        //    setTimeout(() => cooldown = false, 3000);
-
-        //    try {
-        //        const response = await fetch('http://localhost:5005/model/parse', {
-        //            method: 'POST',
-        //            headers: { 'Content-Type': 'application/json' },
-        //            body: JSON.stringify({ text: command }),
-        //        });
-
-        //        if (response.ok) {
-        //            const data = await response.json();
-        //            const intent = data.intent.name;
-        //            const confidence = data.intent.confidence;
-        //            log(`Intent: ${intent}, Confiança: ${confidence}`);
-
-        //            if (intent === 'fallback' || confidence < 0.6) {
-        //                responseDiv.textContent = 'Comando não reconhecido. Tente novamente.';
-        //                speak('Desculpe, não percebi o que disse. Pode repetir?');
-        //                log('Fallback acionado.');
-        //            } else {
-        //                switch (intent) {
-        //                    case 'next_slide':
-        //                        sendVoiceCommand('next_slide', 'Passando para o próximo slide.');
-        //                        break;
-        //                    case 'previous_slide':
-        //                        sendVoiceCommand('previous_slide', 'Voltando ao slide anterior.');
-        //                        break;
-        //                    default:
-        //                        responseDiv.textContent = 'Comando não reconhecido.';
-        //                        log('Intent não reconhecida.');
-        //                        break;
-        //                }
-        //            }
-        //        } else {
-        //            responseDiv.textContent = 'Erro ao processar o comando.';
-        //            log('Erro no servidor RASA.');
-        //        }
-        //    } catch (error) {
-        //        log(`Erro na comunicação com o RASA: ${error}`);
-        //        responseDiv.textContent = 'Erro na comunicação com o servidor.';
-        //    }
-        //};
-
-
-        //function sendVoiceCommand(intent, feedback) {
-        //    fetch('http://localhost:5000/api/voice-command/', {
-        //        method: 'POST',
-        //        headers: { 'Content-Type': 'application/json' },
-        //        body: JSON.stringify({ Intent: intent }),
-        //    }).then(() => {
-        //        responseDiv.textContent = feedback;
-        //        speak(feedback);
-        //        log(`Comando enviado: ${intent} - ${feedback}`);
-        //    }).catch(error => {
-        //        log(`Erro ao enviar comando: ${error}`);
-        //    });
-        //}
-
         let isSpeaking = false;
         let cooldown = false;
 
@@ -292,9 +222,76 @@
                     sendVoiceCommand("show_elapsed_time", "A mostrar o tempo decorrido desde o início da apresentação.");
                     break;
 
+                case 'play_video':
+                    console.log("Tentando iniciar reprodução do vídeo.");
+                    sendVoiceCommand('play_video', 'Reproduzindo o vídeo.');
+                    break;
+
+                case 'pause_video':
+                    console.log("Tentando pausar o vídeo.");
+                    sendVoiceCommand('pause_video', 'Pausando o vídeo.');
+                    break;
+
+                case 'stop_video':
+                    sendVoiceCommand('stop_video', 'Parando o vídeo.');
+                    break;
+
+                case 'fast_forward_video':
+                    const forwardSecondsEntity = entities.find((e) => e.entity === 'seconds');
+                    const forwardSeconds = forwardSecondsEntity ? parseInt(forwardSecondsEntity.value, 10) : 10;
+                    if (!isNaN(forwardSeconds) && forwardSeconds > 0) {
+                        sendVoiceCommand('fast_forward_video', `Avançando ${forwardSeconds} segundos no vídeo.`, { Seconds: forwardSeconds });
+                    } else {
+                        responseDiv.textContent = 'Valor inválido para avanço no vídeo.';
+                        speak('Desculpe, não consegui identificar o tempo para avançar. Pode repetir?');
+                    }
+                    break;
+
+                case 'rewind_video':
+                    const rewindSecondsEntity = entities.find((e) => e.entity === 'seconds');
+                    const rewindSeconds = rewindSecondsEntity ? parseInt(rewindSecondsEntity.value, 10) : 10;
+                    if (!isNaN(rewindSeconds) && rewindSeconds > 0) {
+                        sendVoiceCommand('rewind_video', `Retrocedendo ${rewindSeconds} segundos no vídeo.`, { Seconds: rewindSeconds });
+                    } else {
+                        responseDiv.textContent = 'Valor inválido para retroceder no vídeo.';
+                        speak('Desculpe, não consegui identificar o tempo para retroceder. Pode repetir?');
+                    }
+                    break;
+
+                case 'current_slide':
+                    sendVoiceCommand('current_slide', 'Vou verificar o slide atual.');
+                    break;
+
+                case 'restart_presentation':
+                    sendVoiceCommand('restart_presentation', 'A apresentação será reiniciada.');
+                    break;
+
+                case 'start_timer':
+                    sendVoiceCommand('start_timer', 'Temporizador iniciado.');
+                    break;
+
+                case 'stop_timer':
+                    sendVoiceCommand('stop_timer', 'Temporizador parado.');
+                    break;
+
+                case 'helper':
+                    sendVoiceCommand('helper', 'A mostrar os comandos disponíveis.');
+                    break;
+
+                case 'greet':
+                    sendVoiceCommand('greet', 'Olá! Como posso ajudar hoje?');
+                    break;
+                case 'ask_how_are_you':
+                    sendVoiceCommand('ask_how_are_you', 'Estou ótimo, obrigado por perguntar! Como está você?');
+                    break;
+                case 'respond_how_am_i':
+                    sendVoiceCommand('respond_how_am_i', 'Que bom ouvir isso! Estou aqui para o que precisar.');
+                    break;
+
                 default:
                     responseDiv.textContent = 'Comando não reconhecido.';
-                    console.log('Intent não reconhecida.');
+                    speak('Desculpe, não entendi o comando. Pode repetir?');
+                    console.warn(`Intent não reconhecido: ${intent}`);
             }
         }
 
@@ -351,12 +348,6 @@
             if (socket && socket.readyState === WebSocket.OPEN) {
                 const message = JSON.stringify({ Intent: intent, ...additionalData });
                 console.log(`Payload sent to WebSocket: ${message}`); // Debug log
-                //if (SlideNumber) {
-                //    console.log(`Payload sent to WebSocket: ${JSON.stringify({ Intent: intent, SlideNumber: additionalData?.slideNumber })}`);
-                //}
-                //if (SlideTitle) {
-                //    console.log(`Sending payload: ${JSON.stringify({ Intent: intent, SlideTitle: slideTitle })}`);
-                //}
                 socket.send(message);
                 console.log(`Comando enviado: ${intent}`);
                 responseDiv.textContent = feedback;

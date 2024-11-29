@@ -94,6 +94,245 @@ nlu:
       - Tempo total da apresentação.
       - Quero saber o tempo decorrido.
 
+  - intent: play_video
+    examples: |
+      - Reproduz o vídeo!
+      - Mete o vídeo a dar.
+      - Inicia o vídeo agora.
+      - Dá play no vídeo.
+      - Põe o vídeo a tocar.
+      - Bora lá ver o vídeo.
+      - Começa o vídeo, já!
+      - Faz o vídeo começar.
+      - Quero ver o vídeo, põe-no a dar.
+      - Vai lá, toca o vídeo.
+      - Ativa o vídeo para mim.
+      - Arranca com o vídeo.
+
+  - intent: pause_video
+    examples: |
+      - Pára o vídeo!
+      - Dá pausa no vídeo.
+      - Faz pausa no vídeo.
+      - Mete o vídeo em pausa.
+      - Faz uma pausa no vídeo.
+      - Interrompe o vídeo.
+      - Dá um tempo ao vídeo.
+      - Mete o vídeo em stand-by.
+      - Pausa o vídeo agora.
+      - Para de tocar o vídeo por favor.
+      - Suspende o vídeo por um momento.
+
+  - intent: stop_video
+    examples: |
+      - Termina o vídeo.
+      - Acaba com o vídeo.
+      - Pára já o vídeo.
+      - Cancela o vídeo.
+      - Encerra o vídeo.
+      - Fecha o vídeo.
+      - Dá stop no vídeo.
+      - Faz o vídeo parar agora.
+      - Não quero mais o vídeo, para-o.
+      - Interrompe e termina o vídeo.
+
+
+  - intent: fast_forward_video
+    examples: |
+      - Avança o vídeo.
+      - Salta para a frente no vídeo.
+      - Mete o vídeo 10 segundos à frente.
+      - Dá um avanço no vídeo.
+      - Faz o vídeo andar para a frente.
+      - Adianta o vídeo para mim.
+      - Quero ver mais à frente no vídeo.
+      - Passa este bocado do vídeo.
+      - Avança para a próxima parte do vídeo.
+      - Mete o vídeo mais à frente.
+
+
+  - intent: rewind_video
+    examples: |
+      - Recuar o vídeo.
+      - Volta 10 segundos atrás no vídeo.
+      - Mete o vídeo para trás.
+      - Anda para trás no vídeo.
+      - Faz um rewind no vídeo.
+      - Vai para o início do vídeo.
+      - Quero rever esta parte, mete atrás.
+      - Dá um salto para trás no vídeo.
+      - Regressa uns segundos no vídeo.
+      - Faz o vídeo voltar para trás.
+
+
+  - intent: adjust_volume
+    examples: |
+      - Aumenta o volume.
+      - Baixa o som do vídeo.
+      - Mete o som mais alto.
+      - Reduz o volume do vídeo.
+      - Faz o vídeo mais audível.
+      - Tira o som do vídeo.
+      - Faz o som mais baixo.
+      - Dá um boost no som.
+      - Torna o som mais claro.
+      - Ajusta o volume do vídeo para mim.
+
+
+  - intent: jump_to_time
+    examples: |
+      - Vai para 2 minutos no vídeo.
+      - Salta para 1 minuto e meio.
+      - Mete o vídeo aos 90 segundos.
+      - Quero começar aos 5 minutos no vídeo.
+      - Põe o vídeo no tempo que pedi.
+      - Passa para o minuto 3 do vídeo.
+      - Avança para 4 minutos no vídeo.
+      - Mete o vídeo a partir de 2:30.
+      - Vai para o minuto certo que disse.
+      - Toca o vídeo começando do minuto 1.
+
+
+  - intent: play_fullscreen
+    examples: |
+     - Mete o vídeo em ecrã inteiro.
+     - Faz o vídeo preencher o ecrã todo.
+     - Coloca o vídeo em fullscreen.
+     - Quero o vídeo em modo de tela cheia.
+     - Põe o vídeo em ecrã total.
+     - Ativa o modo fullscreen para o vídeo.
+     - Quero ver o vídeo no ecrã todo.
+     - Expande o vídeo para o ecrã completo.
+     - Mete o vídeo em full.
+     - Tira as distrações, ecrã inteiro no vídeo.
+
+  - intent: current_slide
+    examples: |
+      - Em que slide estou?
+      - Qual o slide atual?
+      - Diga-me o slide atual
+      - Mostre-me o número do slide
+      - Estou no slide quantos?
+      - Que slide está a ser apresentado?
+      - Qual o número do slide atual?
+      - Pode dizer-me o número do slide?
+      - Que slide estou a ver?
+      - Slide atual, por favor
+      - Estou no slide quantos agora?
+      - Qual é o slide agora?
+      - Quantos slides faltam?
+      - Estou no slide quantos?
+      - Diga em que slide estamos
+
+
+  - intent: restart_presentation
+    examples: |
+      - Reinicia a apresentação
+      - Começa do início
+      - Reinicie a apresentação
+      - Quero começar do início
+      - Começar a apresentação de novo
+      - Recomeça a apresentação
+      - Volte ao primeiro slide
+      - Reinicia agora
+      - Reiniciar a apresentação
+      - Voltar ao início
+
+  - intent: start_timer
+    examples: |
+      - Inicia o temporizador
+      - Quero começar a cronometrar
+      - Começa o temporizador
+      - Liga o temporizador
+      - Quero ativar o temporizador
+      - Iniciar temporizador
+      - Comece a contar o tempo
+      - Inicia agora o temporizador
+      - Iniciar a contagem de tempo
+      - Temporizador em ação
+
+  - intent: stop_timer
+    examples: |
+      - Para o temporizador
+      - Para de contar o tempo
+      - Desliga o temporizador
+      - Pare o temporizador
+      - Termina o temporizador
+      - Quero parar o cronómetro
+      - Desativar o temporizador
+      - Termina a contagem de tempo
+      - Concluir o temporizador
+      - Encerrar o temporizador
+
+  - intent: helper
+    examples: |
+      - Ajuda
+      - Quais comandos posso usar?
+      - Como funciona?
+      - Preciso de ajuda
+      - Mostra-me os comandos
+      - Que comandos existem?
+      - Explica como usar
+
+  - intent: greet
+    examples: |
+      - Olá
+      - Bom dia
+      - Boa tarde
+      - Boa noite
+      - Olá, como estás?
+      - Ei, tudo bem?
+      - Como te sentes?
+      - Boas
+      - E aí?
+      - Saudações
+      - Oi
+      - Tudo fixe?
+      - Está tudo?
+      - Como vão as coisas?
+      - Estás por aqui?
+
+  - intent: ask_how_are_you
+    examples: |
+      - Está tudo bem?
+      - Como está?
+      - Tudo bem contigo?
+      - Está bem?
+      - Como vai?
+      - Como tens andado?
+      - Correm bem as coisas?
+      - Estás bem?
+      - Tudo certo contigo?
+      - Como estão as coisas?
+      - Tudo ok?
+      - Como está o dia?
+      - Estás fixe?
+      - Tudo calmo?
+      - Alguma novidade?
+
+  - intent: respond_how_am_i
+    examples: |
+      - Estou bem
+      - Estou ótimo
+      - Estou feliz
+      - Não estou muito bem
+      - Estou cansado
+      - Estou péssimo
+      - Estou cheio de energia
+      - Não estou nos meus melhores dias
+      - Tenho estado melhor
+      - Está tudo tranquilo
+      - Estou porreiro
+      - Não estou nada mal
+      - Estou descansado
+      - Estou um pouco chateado
+      - Estou contente hoje
+      - Estou motivado
+      - Já estive melhor
+      - Estou satisfeito
+      - Estou animado
+      - Estou exausto
+
   - intent: fallback
     examples: |
       - qual é a próxima reunião?

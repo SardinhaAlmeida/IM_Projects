@@ -1,0 +1,279 @@
+version: "3.1"
+
+nlu:
+  - intent: next_slide
+    examples: |
+      - Próximo slide, por favor
+      - Avançando para o próximo slide
+      - Estou farta deste slide passa para o próximo
+      - Já terminei este 
+      - Avançar slide
+      - Vai para o próximo
+      - Passa para o próximo slide
+      - Próximo
+
+  - intent: previous_slide
+    examples: |
+      - Slide anterior
+      - Esqueci-me de dizer uma coisa no slide anterior
+      - Voltar para o slide anterior
+      - Vai para trás
+      - Voltar slide
+      - Retrocede para o slide anterior
+ 
+  - intent: jump_to_slide_by_title
+    examples: |
+      - Mostra-me o slide com o título [Resultados](slide_title), por favor
+      - Passando para o slide de [Resultados](slide_title)
+      - Passando para o slide do [Resultados](slide_title)
+      - Passando para o slide da [Resultados](slide_title)
+      - Passando para o slide dos [Resultados](slide_title)
+      - Passando para o slide das [Resultados](slide_title)
+      - Quero ver o slide [Tecnologias Utilizadas](slide_title), por favor
+      - Muda para o slide [Introdução](slide_title)
+      - Vai para o slide com o título [Introdução](slide_title)
+      - Vai para o slide de título [Introdução](slide_title)
+      - Gostava de ver o slide com o título [Índice](slide_title)
+      - Quero saltar para o slide [Resultados](slide_title)
+      - Quero ir para o slide [Introdução](slide_title)
+      - Mostra já o slide [Resultados](slide_title)
+      - Pode mostrar-me o slide [Índice](slide_title)?
+      - Mostra o slide [Agenda](slide_title), por favor
+      - Salta para o slide [Resultados](slide_title)
+      - Tira-me deste slide e vai para o slide [Introdução](slide_title)
+      - Muda já para o slide [Resultados](slide_title)
+      - Slide com o título [Introdução](slide_title), por favor
+      - Passa já para o slide [Resultados](slide_title)
+      - Vai ao slide com o título [Tecnologias Utilizadas](slide_title)
+      - Avança para o slide [Tecnologias Utilizadas](slide_title)
+      - Traz-me o slide [Resultados](slide_title)
+      - Quero o slide chamado [Introdução](slide_title)
+      - Dá-me o slide [Índice](slide_title)
+      - Apresenta o slide [Resultados](slide_title)
+      - Mostra o slide chamado [Introdução](slide_title)
+      - Mostra a parte [Resultados](slide_title)
+      - Quero ver a parte do slide [Introdução](slide_title)
+      - Altera para o slide com o nome [Agenda](slide_title)
+      - Posso ver o slide [Resultados](slide_title)?
+      - Muda imediatamente para o slide [Introdução](slide_title)
+      - Slide [Agenda](slide_title), por favor
+      - Vai até o slide chamado [Resultados](slide_title)
+      - Posso ver o slide de título [Agenda](slide_title)?
+      - Troca para o slide [Introdução](slide_title)
+      - Muda para o slide com o nome [Resultados](slide_title)
+      - Gostava de ver o slide que tem o título [Agenda](slide_title)
+      - Pode avançar para o slide [Resultados](slide_title)?
+      - Por favor, passa ao slide com o título [Introdução](slide_title)
+      - Para o slide [Agenda](slide_title), por favor
+      - Troca já para o slide [Resultados](slide_title)
+
+
+  - intent: jump_to_slide_by_number
+    examples: |
+     - Passando para o slide número [1](slide_number)
+     - Vai para o slide número [3](slide_number)
+     - Mostra-me o slide número [5](slide_number), por favor
+     - Muda para o slide número [2](slide_number)
+     - Quero o slide número [4](slide_number)
+
+  - intent: highlight_phrase
+    examples: |
+      - Destaca a frase [Apresentações são essenciais](phrase)
+      - Sublinha a frase [Processamento de linguagem natural](phrase)
+      - Quero sublinhar [Tecnologias utilizadas no projeto](phrase)
+      - Realça [Simples e intuitivos para apresentadores](phrase)
+      - Dá ênfase à frase [Objetivo do projeto é simplificar o processo](phrase)
+      - Pode sublinhar [Vantagens de usar o sistema](phrase)?
+      - Marque [Desafios enfrentados durante a implementação](phrase)
+      - Quero que destaque [Introdução do problema](phrase)
+      - Sublinha o texto [Simplificar](phrase)
+      - Destaca [Passos futuros para o projeto](phrase)
+
+  - intent: zoom_in
+    examples: |
+      - Dá zoom na imagem
+      - Amplia a área da imagem
+      - Faz zoom na imagem do slide
+      - Quero ver melhor esta imagem
+      - Amplia o slide na zona da imagem
+      - Dá zoom no slide
+      - Amplia o slide
+      - Faz zoom
+      - Aumenta o zoom
+      - Quero ver melhor este slide
+      - Amplia para mim
+
+  - intent: zoom_out
+    examples: |
+      - Reduz o zoom
+      - Dá zoom out
+      - Volta ao tamanho normal
+      - Reverte o zoom
+      - Diminui o zoom
+      - Mostra o slide no tamanho original
+      - Volta ao tamanho normal do slide
+      - Reverte a ampliação
+      - Mostra o slide inteiro
+
+  - intent: show_elapsed_time
+    examples: |
+      - Quanto tempo passou?
+      - Mostra o tempo da apresentação.
+      - Quanto tempo de apresentação?
+      - Quanto tempo de apresentacao
+      - Diz-me o tempo desde o início.
+      - Tempo total da apresentação.
+      - Quero saber o tempo decorrido.
+      - Espero não estar a passar do tempo permitido.
+  
+  - intent: get_current_slide
+    examples: |
+      - Qual é o slide atual?
+      - Em que slide estou?
+      - Mostra o slide atual
+      - Em que número de slide estamos?
+      - Qual o slide que está a ser apresentado?
+  
+  - intent: slides_left
+    examples: |
+      - Quantos slides faltam?
+      - Quantos slides ainda restam?
+      - Quantos slides ainda há?
+      - Quanto falta para terminar a apresentação?
+      - Quantos slides sobraram?
+      - Falta muito para acabar os slides?
+      - Ainda faltam muitos slides?
+  
+  - intent: restart_presentation
+    examples: |
+      - Reinicia a apresentação
+      - Começa do início
+      - Reinicie a apresentação
+      - Quero começar do início
+      - Começar a apresentação de novo
+      - Recomeça a apresentação
+      - Reinicia agora
+      - Reiniciar a apresentação
+      - Voltar ao início
+
+  - intent: start_timer
+    examples: |
+      - Inicia o temporizador
+      - Quero começar a cronometrar
+      - Começa o temporizador
+      - Liga o temporizador
+      - Quero ativar o temporizador
+      - Iniciar temporizador
+      - Inicia agora o temporizador
+      - Temporizador em ação
+
+  - intent: stop_timer
+    examples: |
+      - Para o temporizador
+      - Desliga o temporizador
+      - Pare o temporizador
+      - Termina o temporizador
+      - Quero parar o cronómetro
+      - Desativar o temporizador
+      - Concluir o temporizador
+      - Encerrar o temporizador
+
+  - intent: close_presentation
+    examples: |
+      - Terminamos assim a apresentação
+      - Fechar a apresentação
+      - Fecha o PowerPoint
+      - Termina a apresentação
+      - Encerra a apresentação
+      - Acaba a apresentação
+
+  - intent: helper
+    examples: |
+      - Ajuda
+      - Quais comandos posso usar?
+      - Como funciona?
+      - Preciso de ajuda
+      - Mostra-me os comandos
+      - Que comandos existem?
+      - Explica como usar
+
+  - intent: greet
+    examples: |
+      - Olá
+      - Bom dia
+      - Boa tarde
+      - Boa noite
+      - Olá, como estás?
+      - Ei, tudo bem?
+      - Como te sentes?
+      - Boas
+      - E aí?
+      - Saudações
+      - Oi
+      - Tudo fixe?
+      - Está tudo?
+      - Como vão as coisas?
+      - Estás por aqui?
+
+  - intent: ask_how_are_you
+    examples: |
+      - Está tudo bem?
+      - Como está?
+      - Tudo bem contigo?
+      - Está bem?
+      - Como vai?
+      - Como tens andado?
+      - Correm bem as coisas?
+      - Estás bem?
+      - Tudo certo contigo?
+      - Como estão as coisas?
+      - Tudo ok?
+      - Como está o dia?
+      - Estás fixe?
+      - Tudo calmo?
+      - Alguma novidade?
+
+  - intent: respond_how_am_i
+    examples: |
+      - Estou bem
+      - Estou ótimo
+      - Estou feliz
+      - Não estou muito bem
+      - Estou cansado
+      - Estou péssimo
+      - Estou cheio de energia
+      - Não estou nos meus melhores dias
+      - Tenho estado melhor
+      - Está tudo tranquilo
+      - Estou porreiro
+      - Não estou nada mal
+      - Estou descansado
+      - Estou um pouco chateado
+      - Estou contente hoje
+      - Estou motivado
+      - Já estive melhor
+      - Estou satisfeito
+      - Estou animado
+      - Estou exausto
+
+  - intent: nlu_fallback
+    examples: |
+      - qual é a próxima reunião?
+      - qual o tema de hoje?
+      - o que está no ecrã agora?
+      - preciso de um intervalo
+      - tem alguma pergunta?
+      - pode repetir a última parte?
+      - quando vamos terminar?
+      - esta parte não é clara
+      - quantas pessoas estão a assistir?
+      - que dia é hoje?
+      - vou já responder à pergunta
+      - desculpe, tive um problema técnico
+      - estou um pouco nervoso
+      - quero agradecer a todos por estarem aqui
+      - onde é que estava?
+      - obrigado pela atenção
+      - podem ouvir-me bem?
+      - esta luz é muito forte
+      - alguém tem alguma questão?

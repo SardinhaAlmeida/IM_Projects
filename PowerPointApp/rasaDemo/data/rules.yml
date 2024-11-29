@@ -1,0 +1,68 @@
+version: '3.1'
+
+rules:
+- rule: Respond to next slide
+  steps:
+  - intent: next_slide
+  - action: utter_next_slide
+
+- rule: Respond to previous slide
+  steps:
+  - intent: previous_slide
+  - action: utter_previous_slide
+  
+- rule: Handle jump to slide by title
+  steps:
+  - intent: jump_to_slide_by_title
+  - action: utter_confirm_title
+
+- rule: Handle jump to slide by number
+  steps:
+  - intent: jump_to_slide_by_number
+  - action: utter_confirm_number
+ 
+- rule: Handle highlight phrase
+  steps:
+  - intent: highlight_phrase
+  - action: utter_highlight_phrase
+  
+- rule: Handle zoom in
+  steps:
+  - intent: zoom_in
+  - action: utter_zoom_in
+
+- rule: Handle zoom out
+  steps:
+  - intent: zoom_out
+  - action: utter_zoom_out
+
+- rule: Handle elapsed time
+  steps:
+  - intent: show_elapsed_time
+  - action: action_show_elapsed_time
+
+- rule: Handle close presentation
+  steps:
+  - intent: close_presentation
+  - action: utter_close_presentation
+
+- rule: Handle get current slide
+  steps:
+  - intent: get_current_slide
+  - action: utter_get_current_slide
+
+- rule: Handle slides left
+  steps:
+  - intent: slides_left
+  - action: utter_slides_left
+
+- rule: Handle restart presentation
+  steps:
+  - intent: restart_presentation
+  - action: utter_restart_presentation
+
+- rule: Fallback rule
+  steps:
+  - intent: fallback
+  - action: utter_default
+  

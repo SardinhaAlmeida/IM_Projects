@@ -1,0 +1,138 @@
+version: '3.1'
+
+intents:
+  - next_slide
+  - previous_slide
+  - jump_to_slide_by_title
+  - jump_to_slide_by_number
+  - highlight_phrase
+  - zoom_in
+  - zoom_out
+  - show_elapsed_time
+  - get_current_slide
+  - slides_left
+  - restart_presentation
+  - start_timer
+  - stop_timer
+  - close_presentation
+  - fallback
+
+entities:
+  - slide_title
+  - slide_number
+  - phrase
+
+slots:
+  slide_title:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: slide_title
+
+  slide_number:
+    type: text
+    influence_conversation: false
+    mappings:
+      - type: from_entity
+        entity: slide_number
+
+  phrase:
+    type: text
+    mappings:
+      - type: from_entity
+        entity: phrase
+
+responses:
+  utter_next_slide:
+    - text: "Passando para o próximo slide."
+
+  utter_previous_slide:
+    - text: "Voltando ao slide anterior."
+  
+  utter_confirm_title:
+    - text: "Indo para o slide com o título: {slide_title}."
+  
+  utter_confirm_number:
+    - text: "Indo para o slide número: {slide_number}."
+  
+  utter_unknown_title:
+    - text: "Não encontrei um slide com o título: {slide_title}."
+  
+  utter_unknown_number:
+    - text: "O número do slide {slide_number} não é válido."
+  
+  utter_highlight_phrase:
+    - text: "Sublinhando a frase: {phrase}."
+  
+  utter_unknown_phrase:
+    - text: "Não encontrei a frase que pediu para sublinhar."
+  
+  utter_zoom_in:
+    - text: "Aumentando o zoom no slide."
+
+  utter_zoom_out:
+    - text: "Reduzindo o zoom no slide."
+  
+  utter_close_presentation:
+    - text: "Adeus."
+  
+  utter_show_elapsed_time:
+    - text: "Calculando o tempo decorrido..."
+  
+  utter_get_current_slide:
+    - text: "Vou verificar."
+  
+  utter_slides_left:
+    - text: "Vou verificar."
+  
+  utter_restart_presentation:
+    - text: "A reiniciar a apresentação."
+  
+  utter_start_timer:
+    - text: "Temporizador iniciado."
+  
+  utter_stop_timer:
+    - text: "Temporizador parado."
+
+  utter_greet:
+    - text: "Olá! Como posso ajudar hoje?"
+    - text: "Bom dia! Espero que esteja tudo bem consigo."
+    - text: "Olá! Pronto para ajudá-lo na sua apresentação."
+
+  utter_ask_how_are_you:
+    - text: "Estou aqui, sempre pronto para ajudar! E você?"
+    - text: "Estou ótimo, obrigado por perguntar! Como está você?"
+    - text: "Tudo bem comigo, espero que esteja bem também."
+
+  utter_respond_how_am_i:
+    - text: "Que bom ouvir isso! Estou aqui para o que precisar."
+    - text: "Espero que melhore logo. Posso ajudar em algo?"
+    - text: "Ótimo saber que está bem! Vamos continuar?"
+  
+  utter_helper:
+    - text: |
+        Aqui estão os comandos que pode usar:
+        - "Próximo slide" para avançar para o próximo slide.
+        - "Slide anterior" para voltar ao slide anterior.
+        - "Reinicia a apresentação" para reiniciar desde o primeiro slide.
+        - "Em que slide estou?" para verificar o slide atual.
+        - "Inicia o temporizador" para começar a cronometrar.
+        - "Para o temporizador" para parar o temporizador.
+        - "Zoom in" para ampliar no slide.
+        - "Zoom out" para reduzir no slide.
+        - "Sublinhar frase [frase]" para destacar uma frase no slide.
+        - "Mostra tempo decorrido" para exibir o tempo desde o início da apresentação.
+
+  utter_default:
+    - text: "Desculpe, não percebi o que disse. Pode repetir?"
+
+actions:
+  - action_next_slide
+  - action_previous_slide
+  - action_show_elapsed_time
+
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

@@ -1,0 +1,36 @@
+[
+  {
+    "tag_name": "entity",
+    "ids_to_tags": {
+      "1": "B-phrase",
+      "2": "I-phrase",
+      "3": "L-phrase",
+      "4": "U-phrase",
+      "5": "B-slide_number",
+      "6": "I-slide_number",
+      "7": "L-slide_number",
+      "8": "U-slide_number",
+      "9": "B-slide_title",
+      "10": "I-slide_title",
+      "11": "L-slide_title",
+      "12": "U-slide_title",
+      "0": "O"
+    },
+    "tags_to_ids": {
+      "B-phrase": 1,
+      "I-phrase": 2,
+      "L-phrase": 3,
+      "U-phrase": 4,
+      "B-slide_number": 5,
+      "I-slide_number": 6,
+      "L-slide_number": 7,
+      "U-slide_number": 8,
+      "B-slide_title": 9,
+      "I-slide_title": 10,
+      "L-slide_title": 11,
+      "U-slide_title": 12,
+      "O": 0
+    },
+    "num_tags": 13
+  }
+]

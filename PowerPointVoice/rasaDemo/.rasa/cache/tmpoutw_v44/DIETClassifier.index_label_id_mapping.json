@@ -1,0 +1,1 @@
+{"0": "close_presentation", "1": "get_current_slide", "2": "highlight_phrase", "3": "jump_to_slide_by_number", "4": "jump_to_slide_by_title", "5": "next_slide", "6": "nlu_fallback", "7": "previous_slide", "8": "restart_presentation", "9": "show_elapsed_time", "10": "slides_left", "11": "start_timer", "12": "stop_timer", "13": "zoom_in", "14": "zoom_out"}

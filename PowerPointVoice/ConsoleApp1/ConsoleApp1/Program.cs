@@ -36,8 +36,23 @@ class Program
 
                 Console.WriteLine("Initializing PowerPoint...");
                 Application pptApp = new Application();
+
+                // Get the project root directory (ConsoleApp1)
+                string projectDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
+
+                // Combine with the filename in the project directory
+                string pptFilePath = Path.Combine(projectDir, "IM_Final_Voice_108796-108067.pptx");
+
+                // Ensure the file exists before trying to open it
+                Console.WriteLine($"Looking for presentation at: {pptFilePath}");
+                if (!File.Exists(pptFilePath))
+                {
+                    Console.WriteLine("Presentation file does not exist!");
+                    return;
+                }
+
                 _presentation = pptApp.Presentations.Open(
-                    @"C:\Users\Asus\Downloads\IM Second Presentation (1).pptx",
+                    pptFilePath,
                     Mso.MsoTriState.msoTrue,
                     Mso.MsoTriState.msoFalse,
                     Mso.MsoTriState.msoTrue);
@@ -346,7 +361,7 @@ class Program
                         }
                         if (intent == "respond_how_am_i")
                         {
-                            await SendMessage(client, messageMMI("Que bom ouvir isso! Estou aqui para o que precisar."));
+                            await SendMessage(client, messageMMI("Estou aqui para o que precisar."));
                         }
 
                         if (intent == "close_presentation")

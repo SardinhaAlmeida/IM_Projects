@@ -117,6 +117,7 @@ class Program
                             if (messageJSON != null && messageJSON["recognized"] != null && messageJSON["recognized"].Count > 1)
                             {
                                 string gesture = messageJSON["recognized"][1];
+                                string confidence = messageJSON["confidence"];
                                 Console.WriteLine($"Gesture: {gesture}");
 
 
@@ -152,28 +153,10 @@ class Program
 
                                 //}
 
-                                //if (intent == "jump_to_slide_by_title")
-                                //{
-                                //    string title = messageJSON.nlu.slide_title;
-                                //    bool found = false;
-
-                                //    foreach (Slide slide in _presentation.Slides)
-                                //    {
-                                //        if (slide.Shapes.HasTitle == Mso.MsoTriState.msoTrue &&
-                                //            slide.Shapes.Title.TextFrame.TextRange.Text.Equals(title, StringComparison.OrdinalIgnoreCase))
-                                //        {
-                                //            _presentation.SlideShowWindow.View.GotoSlide(slide.SlideIndex);
-                                //            found = true;
-                                //            break;
-                                //        }
-                                //    }
-
-                                //    if (found)
-                                //        await SendMessage(client, messageMMI($"Indo para o slide com o título '{title}'."));
-
-                                //    else
-                                //        await SendMessage(client, messageMMI($"Slide com o título '{title}' não encontrado."));
-                                //}
+                                if (gesture == "SILENCE")
+                                {
+                                        await SendMessage(client, messageMMI("Pedimos silêncio à audiência, por favor! "));
+                                }
 
                                 //if (intent == "highlight_phrase")
                                 //{
@@ -208,11 +191,34 @@ class Program
                                 //        await SendMessage(client, messageMMI($"Não foi possível destacar o texto '{phraseToHighlight}'."));
                                 //}
 
-                                //if (intent == "show_elapsed_time")
-                                //{
-                                //    TimeSpan elapsedTime = DateTime.Now - _startTime;
-                                //    await SendMessage(client, messageMMI($"Tempo decorrido: {elapsedTime.Hours} horas, {elapsedTime.Minutes} minutos e {elapsedTime.Seconds} segundos."));
-                                //}
+                                if (gesture == "TIMER")
+                                {
+                                    TimeSpan elapsedTime = DateTime.Now - _startTime;
+                                    await SendMessage(client, messageMMI($" Tempo decorrido: {elapsedTime.Hours} horas, {elapsedTime.Minutes} minutos e {elapsedTime.Seconds} segundos."));
+                                }
+
+                                if (gesture == "QUESTIONS")
+                                {
+                                    string title = "Obrigada";
+                                    bool found = false;
+
+                                    foreach (Slide slide in _presentation.Slides)
+                                    {
+                                        if (slide.Shapes.HasTitle == Mso.MsoTriState.msoTrue &&
+                                            slide.Shapes.Title.TextFrame.TextRange.Text.Equals(title, StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            _presentation.SlideShowWindow.View.GotoSlide(slide.SlideIndex);
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (found)
+                                        await SendMessage(client, messageMMI($"Indo para o slide com o título '{title}'."));
+
+                                    else
+                                        await SendMessage(client, messageMMI($"Slide com o título '{title}' não encontrado."));
+                                }
 
                                 //if (intent == "zoom_in")
                                 //{
@@ -365,22 +371,43 @@ class Program
                                 //{
                                 //    await SendMessage(client, messageMMI("Estou aqui para o que precisar."));
                                 //}
-
-                                //if (intent == "close_presentation")
+                                //if (intent == "jump_to_slide_by_title")
                                 //{
-                                //    if (_presentation != null)
+                                //    string title = messageJSON.nlu.slide_title;
+                                //    bool found = false;
+
+                                //    foreach (Slide slide in _presentation.Slides)
                                 //    {
-                                //        _presentation.SlideShowWindow.View.Exit();
-                                //        _presentation.Close();
-                                //        _presentation.Application.Quit();
-                                //        _presentation = null;
-                                //        await SendMessage(client, messageMMI("Apresentação fechada com sucesso."));
+                                //        if (slide.Shapes.HasTitle == Mso.MsoTriState.msoTrue &&
+                                //            slide.Shapes.Title.TextFrame.TextRange.Text.Equals(title, StringComparison.OrdinalIgnoreCase))
+                                //        {
+                                //            _presentation.SlideShowWindow.View.GotoSlide(slide.SlideIndex);
+                                //            found = true;
+                                //            break;
+                                //        }
                                 //    }
+
+                                //    if (found)
+                                //        await SendMessage(client, messageMMI($"Indo para o slide com o título '{title}'."));
+
                                 //    else
-                                //    {
-                                //        await SendMessage(client, messageMMI("Nenhuma apresentação está aberta."));
-                                //    }
+                                //        await SendMessage(client, messageMMI($"Slide com o título '{title}' não encontrado."));
                                 //}
+
+                                if (gesture == "STOP")
+                                {
+                                    if (_presentation != null)
+                                    {
+                                        _presentation.SlideShowWindow.View.Exit();
+                                        _presentation.Close();
+                                        _presentation.Application.Quit();
+                                        _presentation = null;
+                                    }
+                                    else
+                                    {
+                                        await SendMessage(client, messageMMI("Nenhuma apresentação está aberta."));
+                                    }
+                                }
                             }
                             else
                             {

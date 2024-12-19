@@ -10,4 +10,29 @@
     <NAME>previous_slide</NAME>
     <SEMANTIC>previousslide</SEMANTIC>
   </Gesture>
+  <Gesture>
+    <ID>2</ID>
+    <NAME>questions</NAME>
+    <SEMANTIC>questions</SEMANTIC>
+  </Gesture>
+  <Gesture>
+    <ID>3</ID>
+    <NAME>silence</NAME>
+    <SEMANTIC>silence</SEMANTIC>
+  </Gesture>
+  <Gesture>
+    <ID>4</ID>
+    <NAME>start</NAME>
+    <SEMANTIC>start</SEMANTIC>
+  </Gesture>
+  <Gesture>
+    <ID>5</ID>
+    <NAME>stop</NAME>
+    <SEMANTIC>stop</SEMANTIC>
+  </Gesture>
+  <Gesture>
+    <ID>6</ID>
+    <NAME>timer</NAME>
+    <SEMANTIC>timer</SEMANTIC>
+  </Gesture>
 </Gestures>

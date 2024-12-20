@@ -22,16 +22,21 @@
   </Gesture>
   <Gesture>
     <ID>4</ID>
+    <NAME>skip</NAME>
+    <SEMANTIC>skip</SEMANTIC>
+  </Gesture>
+  <Gesture>
+    <ID>5</ID>
     <NAME>start</NAME>
     <SEMANTIC>start</SEMANTIC>
   </Gesture>
   <Gesture>
-    <ID>5</ID>
+    <ID>6</ID>
     <NAME>stop</NAME>
     <SEMANTIC>stop</SEMANTIC>
   </Gesture>
   <Gesture>
-    <ID>6</ID>
+    <ID>7</ID>
     <NAME>timer</NAME>
     <SEMANTIC>timer</SEMANTIC>
   </Gesture>

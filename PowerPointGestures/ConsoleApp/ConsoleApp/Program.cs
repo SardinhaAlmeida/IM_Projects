@@ -42,7 +42,7 @@ class Program
                 string projectDir = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
 
                 // Combine with the filename in the project directory
-                string pptFilePath = Path.Combine(projectDir, "IM_Final_Voice_108796-108067.pptx");
+                string pptFilePath = Path.Combine(projectDir, "IM_Final_Gesture_108796-108067.pptx");
 
                 // Ensure the file exists before trying to open it
                 Console.WriteLine($"Looking for presentation at: {pptFilePath}");
@@ -52,14 +52,25 @@ class Program
                     return;
                 }
 
+                //_presentation = pptApp.Presentations.Open(
+                //    pptFilePath,
+                //    Mso.MsoTriState.msoTrue,
+                //    Mso.MsoTriState.msoFalse,
+                //    Mso.MsoTriState.msoTrue);
+
+                //Console.WriteLine("Running slideshow...");
+                //_presentation.SlideShowSettings.Run();
+                //_startTime = DateTime.Now;
+
+
+                // Open the presentation without starting slideshow mode
                 _presentation = pptApp.Presentations.Open(
                     pptFilePath,
                     Mso.MsoTriState.msoTrue,
                     Mso.MsoTriState.msoFalse,
-                    Mso.MsoTriState.msoTrue);
+                    Mso.MsoTriState.msoFalse);
 
-                Console.WriteLine("Running slideshow...");
-                _presentation.SlideShowSettings.Run();
+                Console.WriteLine("PowerPoint opened without slideshow mode.");
                 _startTime = DateTime.Now;
 
 
@@ -137,59 +148,10 @@ class Program
 
                                 }
 
-                                //if (intent == "jump_to_slide_by_number")
-                                //{
-                                //    int slideNumber = (int)messageJSON.nlu.slide_number;
-
-                                //    if (slideNumber > 0 && slideNumber <= _presentation.Slides.Count)
-                                //    {
-                                //        _presentation.SlideShowWindow.View.GotoSlide(slideNumber);
-                                //        await SendMessage(client, messageMMI($"Indo para o slide número {slideNumber}."));
-                                //    }
-                                //    else
-                                //    {
-                                //        await SendMessage(client, messageMMI($"Slide número {slideNumber} não encontrado."));
-                                //    }
-
-                                //}
-
                                 if (gesture == "SILENCE")
                                 {
                                         await SendMessage(client, messageMMI("Pedimos silêncio à audiência, por favor! "));
                                 }
-
-                                //if (intent == "highlight_phrase")
-                                //{
-                                //    string phraseToHighlight = messageJSON.nlu.phrase;
-                                //    bool found = false;
-
-                                //    foreach (Slide slide in _presentation.Slides)
-                                //    {
-                                //        foreach (Shape shape in slide.Shapes)
-                                //        {
-                                //            if (shape.HasTextFrame == Mso.MsoTriState.msoTrue)
-                                //            {
-                                //                string text = shape.TextFrame.TextRange.Text;
-                                //                int startIndex = text.IndexOf(phraseToHighlight, StringComparison.OrdinalIgnoreCase);
-                                //                if (startIndex >= 0)
-                                //                {
-                                //                    TextRange foundText = shape.TextFrame.TextRange.Characters(startIndex + 1, phraseToHighlight.Length);
-                                //                    foundText.Font.Bold = Mso.MsoTriState.msoTrue;
-                                //                    foundText.Font.Underline = Mso.MsoTriState.msoTrue;
-                                //                    Console.WriteLine($"Phrase '{phraseToHighlight}' highlighted.");
-                                //                    found = true;
-                                //                    break;
-                                //                }
-                                //            }
-                                //        }
-                                //        if (found) break;
-                                //    }
-
-                                //    if (found)
-                                //        await SendMessage(client, messageMMI($"Texto '{phraseToHighlight}' destacado."));
-                                //    else
-                                //        await SendMessage(client, messageMMI($"Não foi possível destacar o texto '{phraseToHighlight}'."));
-                                //}
 
                                 if (gesture == "TIMER")
                                 {
@@ -199,13 +161,13 @@ class Program
 
                                 if (gesture == "QUESTIONS")
                                 {
-                                    string title = "Obrigada";
+                                    string title = "Obrigada!";
                                     bool found = false;
 
                                     foreach (Slide slide in _presentation.Slides)
                                     {
                                         if (slide.Shapes.HasTitle == Mso.MsoTriState.msoTrue &&
-                                            slide.Shapes.Title.TextFrame.TextRange.Text.Equals(title, StringComparison.OrdinalIgnoreCase))
+                                            slide.Shapes.Title.TextFrame.TextRange.Text.Trim().Equals(title, StringComparison.OrdinalIgnoreCase))
                                         {
                                             _presentation.SlideShowWindow.View.GotoSlide(slide.SlideIndex);
                                             found = true;
@@ -214,194 +176,76 @@ class Program
                                     }
 
                                     if (found)
-                                        await SendMessage(client, messageMMI($"Indo para o slide com o título '{title}'."));
+                                        await SendMessage(client, messageMMI($"Alguém tem alguma dúvida?."));
 
                                     else
                                         await SendMessage(client, messageMMI($"Slide com o título '{title}' não encontrado."));
                                 }
 
-                                //if (intent == "zoom_in")
-                                //{
-                                //    var slide = _presentation.SlideShowWindow.View.Slide;
-                                //    Shape focusShape = null;
-                                //    float maxArea = 0;
+                                if (gesture == "SKIP")
+                                {
+                                    try
+                                    {
+                                        // Obtém o índice atual do slide
+                                        int currentSlideIndex = _presentation.SlideShowWindow.View.Slide.SlideIndex;
 
-                                //    foreach (Shape shape in slide.Shapes)
-                                //    {
-                                //        if (shape.Type == Mso.MsoShapeType.msoPicture || shape.Type == Mso.MsoShapeType.msoAutoShape)
-                                //        {
-                                //            float area = shape.Width * shape.Height;
-                                //            if (area > maxArea)
-                                //            {
-                                //                maxArea = area;
-                                //                focusShape = shape;
-                                //            }
+                                        // Calcula o índice do próximo slide
+                                        int nextSlideIndex = currentSlideIndex + 2;
 
-                                //            // Armazena os tamanhos e posições originais, se ainda não estiverem salvos
-                                //            if (!_originalShapes.ContainsKey(shape.Name))
-                                //            {
-                                //                _originalShapes[shape.Name] = (shape.Width, shape.Height, shape.Left, shape.Top);
-                                //            }
-                                //        }
-                                //    }
+                                        // Verifica se o índice do próximo slide está dentro do intervalo válido
+                                        if (nextSlideIndex <= _presentation.Slides.Count)
+                                        {
+                                            // Avança para o slide calculado
+                                            _presentation.SlideShowWindow.View.GotoSlide(nextSlideIndex);
+                                            await SendMessage(client, messageMMI("Saltados 2 slides."));
+                                        }
+                                        else
+                                        {
+                                            // Caso não seja possível avançar dois slides
+                                            await SendMessage(client, messageMMI("Não é possível saltar 2 slides. Já está no final da apresentação."));
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine($"Erro ao avançar 2 slides: {ex.Message}");
+                                        await SendMessage(client, messageMMI("Ocorreu um erro ao tentar avançar 2 slides."));
+                                    }
+                                }
 
-                                //    if (focusShape != null)
-                                //    {
-                                //        // Ampliar e centralizar
-                                //        focusShape.Width *= 1.5f;
-                                //        focusShape.Height *= 1.5f;
-                                //        focusShape.Left = (_presentation.PageSetup.SlideWidth - focusShape.Width) / 2;
-                                //        focusShape.Top = (_presentation.PageSetup.SlideHeight - focusShape.Height) / 2;
+                                if (gesture == "START")
+                                {
+                                    Console.WriteLine("Starting presentation...");
+                                    _presentation.SlideShowSettings.StartingSlide = 1;
+                                    _presentation.SlideShowSettings.EndingSlide = _presentation.Slides.Count;
+                                    _presentation.SlideShowSettings.ShowWithNarration = Mso.MsoTriState.msoTrue;
+                                    _presentation.SlideShowSettings.ShowWithAnimation = Mso.MsoTriState.msoTrue;
 
-                                //        await SendMessage(client, messageMMI($"Simulando zoom na área principal: {focusShape.Name}."));
+                                    _presentation.SlideShowSettings.AdvanceMode = PpSlideShowAdvanceMode.ppSlideShowUseSlideTimings;
 
-                                //    }
-                                //    else
-                                //    {
-                                //        await SendMessage(client, messageMMI("Nenhuma área principal foi encontrada no slide para aplicar zoom."));
-                                //    }
-                                //}
-                                //if (intent == "zoom_out")
-                                //{
-                                //    var slide = _presentation.SlideShowWindow.View.Slide;
+                                    // Run the slideshow
+                                    _presentation.SlideShowSettings.Run();
+                                    await SendMessage(client, messageMMI("Apresentação iniciada."));
 
-                                //    foreach (Shape shape in slide.Shapes)
-                                //    {
-                                //        if (_originalShapes.ContainsKey(shape.Name))
-                                //        {
-                                //            // Restaurar tamanho e posição originais
-                                //            var original = _originalShapes[shape.Name];
-                                //            shape.Width = original.Width;
-                                //            shape.Height = original.Height;
-                                //            shape.Left = original.Left;
-                                //            shape.Top = original.Top;
-                                //        }
-                                //    }
-
-                                //    await SendMessage(client, messageMMI("Zoom revertido"));
-                                //    //else
-                                //    //{
-                                //    //    await SendMessage(client, messageMMI("Nenhuma área principal foi encontrada no slide para aplicar zoom."));
-                                //    //}
-                                //}
+                                    foreach (Slide slide in _presentation.Slides)
+                                    {
+                                        Console.WriteLine("Slide index: " + slide.SlideIndex);
+                                        foreach (Microsoft.Office.Interop.PowerPoint.Shape shape in slide.Shapes)
+                                        {
+                                            if (shape.HasTextFrame == Mso.MsoTriState.msoTrue && shape.TextFrame.TextRange != null)
+                                            {
+                                                Console.WriteLine($"Shape name: {shape.Name}, Text: '{shape.TextFrame.TextRange.Text}'");
+                                            }
+                                        }
+                                    }
 
 
-                                //if (intent == "get_current_slide")
-                                //{
-                                //    if (_presentation?.SlideShowWindow?.View != null)
-                                //    {
-                                //        int currentSlideIndex = _presentation.SlideShowWindow.View.Slide.SlideIndex;
-                                //        await SendMessage(client, messageMMI($"Você está no slide número {currentSlideIndex}."));
-                                //    }
-                                //    else
-                                //    {
-                                //        await SendMessage(client, messageMMI("Nenhuma apresentação está aberta ou ativa."));
-                                //    }
-                                //}
-
-                                //if (intent == "slides_left")
-                                //{
-                                //    if (_presentation?.SlideShowWindow?.View != null)
-                                //    {
-                                //        int currentSlideIndex = _presentation.SlideShowWindow.View.Slide.SlideIndex;
-                                //        int totalSlides = _presentation.Slides.Count;
-                                //        int slidesLeft = totalSlides - currentSlideIndex;
-
-                                //        if (slidesLeft > 0)
-                                //        {
-                                //            await SendMessage(client, messageMMI($"Ainda faltam {slidesLeft} slides para terminar a apresentação."));
-                                //        }
-                                //        else
-                                //        {
-                                //            await SendMessage(client, messageMMI("Você está no último slide."));
-                                //        }
-                                //    }
-                                //    else
-                                //    {
-                                //        await SendMessage(client, messageMMI("Nenhuma apresentação está aberta ou ativa."));
-                                //    }
-                                //}
-
-                                //if (intent == "restart_presentation")
-                                //{
-                                //    if (_presentation?.SlideShowWindow != null)
-                                //    {
-                                //        _presentation.SlideShowWindow.View.GotoSlide(1);
-                                //        await SendMessage(client, messageMMI("Apresentação reiniciada no primeiro slide."));
-                                //    }
-                                //    await SendMessage(client, messageMMI("Nenhuma apresentação está em execução para reiniciar."));
-                                //}
-
-                                //if (intent == "start_timer")
-                                //{
-                                //    _startTime = DateTime.Now; // Reinicia o temporizador com o horário atual
-                                //    Console.WriteLine("Temporizador iniciado.");
-                                //    await SendMessage(client, messageMMI("Temporizador iniciado."));
-                                //}
-                                //if (intent == "stop_timer")
-                                //{
-                                //    if (_startTime == default(DateTime))
-                                //    {
-                                //        Console.WriteLine("Nenhum temporizador ativo.");
-                                //        await SendMessage(client, messageMMI("Nenhum temporizador está ativo."));
-                                //    }
-
-                                //    TimeSpan elapsed = DateTime.Now - _startTime; // Calcula o tempo decorrido
-                                //    _startTime = default(DateTime); // Reseta o temporizador
-                                //    Console.WriteLine("Temporizador parado.");
-                                //    await SendMessage(client, messageMMI($"Temporizador parado. Tempo decorrido: {elapsed.Hours} horas, {elapsed.Minutes} minutos e {elapsed.Seconds} segundos."));
-                                //}
-                                //if (intent == "helper")
-                                //{
-                                //    await SendMessage(client, messageMMI(
-                                //    "Aqui estão os comandos que pode usar para começar: "
-                                //                                            + "- Próximo slide para avançar para o próximo slide. "
-                                //            + "- Slide anterior para voltar ao slide anterior. "));
-                                //}
-
-                                //if (intent == "greet")
-                                //{
-                                //    await SendMessage(client, messageMMI("Olá! Como posso ajudar hoje?"));
-                                //}
-                                //if (intent == "ask_how_are_you")
-                                //{
-                                //    await SendMessage(client, messageMMI("Estou ótimo, obrigado por perguntar! Como está você?"));
-                                //}
-                                //if (intent == "respond_how_am_i")
-                                //{
-                                //    await SendMessage(client, messageMMI("Estou aqui para o que precisar."));
-                                //}
-                                //if (intent == "jump_to_slide_by_title")
-                                //{
-                                //    string title = messageJSON.nlu.slide_title;
-                                //    bool found = false;
-
-                                //    foreach (Slide slide in _presentation.Slides)
-                                //    {
-                                //        if (slide.Shapes.HasTitle == Mso.MsoTriState.msoTrue &&
-                                //            slide.Shapes.Title.TextFrame.TextRange.Text.Equals(title, StringComparison.OrdinalIgnoreCase))
-                                //        {
-                                //            _presentation.SlideShowWindow.View.GotoSlide(slide.SlideIndex);
-                                //            found = true;
-                                //            break;
-                                //        }
-                                //    }
-
-                                //    if (found)
-                                //        await SendMessage(client, messageMMI($"Indo para o slide com o título '{title}'."));
-
-                                //    else
-                                //        await SendMessage(client, messageMMI($"Slide com o título '{title}' não encontrado."));
-                                //}
+                                }
 
                                 if (gesture == "STOP")
                                 {
                                     if (_presentation != null)
                                     {
                                         _presentation.SlideShowWindow.View.Exit();
-                                        _presentation.Close();
-                                        _presentation.Application.Quit();
-                                        _presentation = null;
                                     }
                                     else
                                     {

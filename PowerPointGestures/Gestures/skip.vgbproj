@@ -3,26 +3,26 @@
 	<ProjectFile>
 		<Header>
 			<Date>2024-12-20</Date>
-			<Time>02:21:06.3967552+00:00</Time>
+			<Time>02:49:14.9986738+00:00</Time>
 			<Version>5</Version>
 			<Type>AdaBoostTrigger</Type>
 			<Function>
 				<Type>Training</Type>
-				<ProjectAttribute Name="timer" Type="BOOL" />
+				<ProjectAttribute Name="skip" Type="BOOL" />
 				<ProjectAccompanyAttributes>
 					<Items Name="Confidence" Type="FLOAT" />
 					<Items Name="FirstFrameDetected" Type="BOOL" />
 				</ProjectAccompanyAttributes>
-				<DefaultTag xsi:type="BoolAttribute" Name="timer" Value="false" />
+				<DefaultTag xsi:type="BoolAttribute" Name="skip" Value="false" />
 			</Function>
-			<ID>4b0ad773-990e-446a-adbf-d0777dbc9055</ID>
+			<ID>6df3ee04-7742-4e88-ba27-17e08405b887</ID>
 		</Header>
 		<Project_Data>
 			<Files>
 				<Name />
 				<Content>
 					<Items>
-						<File>clips/timer.vgbclip</File>
+						<File>clips/skip.vgbclip</File>
 					</Items>
 				</Content>
 			</Files>
@@ -38,9 +38,9 @@
 			<Items xsi:type="FloatAttribute" Name="Manual Filter Params: Threshold" Value="0.001" MaxValue="1" MinValue="0" />
 			<Items xsi:type="BoolAttribute" Name="Duplicate And Mirror Data During Training" Value="true" />
 			<Items xsi:type="IntAttribute" Name="% CPU For Training" Value="95" MaxValue="100" MinValue="1" />
-			<Items xsi:type="BoolAttribute" Name="Use Hands Data" Value="false" />
+			<Items xsi:type="BoolAttribute" Name="Use Hands Data" Value="true" />
 			<Items xsi:type="BoolAttribute" Name="Ignore Left Arm" Value="false" />
-			<Items xsi:type="BoolAttribute" Name="Ignore Right Arm" Value="false" />
+			<Items xsi:type="BoolAttribute" Name="Ignore Right Arm" Value="true" />
 			<Items xsi:type="BoolAttribute" Name="Ignore Lower Body" Value="true" />
 		</Attributes>
 	</ProjectFile>

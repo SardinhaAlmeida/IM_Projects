@@ -1,4 +1,4 @@
-package scxmlgen.Modalities;
+package Modalities;
 
 import scxmlgen.interfaces.IModality;
 

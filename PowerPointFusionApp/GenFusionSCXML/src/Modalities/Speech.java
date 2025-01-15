@@ -18,7 +18,7 @@ public enum Speech implements IModality{
 
     // Funcionalidades adicionais
     GO_TO_SLIDE_TITLE("[SPEECH][GO_TO_SLIDE_TITLE]", 2000), // Ir para o slide pelo título
-    GO_TO_SLIDE_NUMBER("[SPEECH][GO_TO_SLIDE_NUMBER]", 2000), // Ir para o slide pelo número
+    //GO_TO_SLIDE_NUMBER("[SPEECH][GO_TO_SLIDE_NUMBER]", 2000), // Ir para o slide pelo número
     HIGHLIGHT_PHRASE("[SPEECH][HIGHLIGHT_PHRASE]", 2000), // Destacar uma frase
     ZOOM_IN("[SPEECH][ZOOM_IN]", 2000), // Zoom in
     ZOOM_OUT("[SPEECH][ZOOM_OUT]", 2000), // Zoom out

@@ -18,7 +18,6 @@ public enum Output implements IOutput{
     REQUEST_SILENCE("[FUSION][REQUEST_SILENCE]"), // Pedir silêncio à audiência
     QUESTIONS("[FUSION][QUESTIONS]"), // Abrir para questões
     GO_TO_SLIDE_TITLE("[FUSION][GO_TO_SLIDE_TITLE]"), // Ir para o slide pelo título
-    GO_TO_SLIDE_NUMBER("[FUSION][GO_TO_SLIDE_NUMBER]"), // Ir para o slide pelo número
     HIGHLIGHT_PHRASE("[FUSION][HIGHLIGHT_PHRASE]"), // Destacar uma frase
     ZOOM_IN("[FUSION][ZOOM_IN]"), // Zoom in
     ZOOM_OUT("[FUSION][ZOOM_OUT]"), // Zoom out
@@ -28,7 +27,7 @@ public enum Output implements IOutput{
     START_TIMER("[FUSION][START_TIMER]"), // Iniciar temporizador
     STOP_TIMER("[FUSION][STOP_TIMER]"); // Parar temporizador
 
-    
+
     //CHANGE_COLOR_TRIANGULO_AZUL("[FUSION][CHANGE_COLOR][TRIANGULO][AZUL]"),
     //CHANGE_COLOR_TRIANGULO_VERDE("[FUSION][CHANGE_COLOR][TRIANGULO][VERDE]"),
     //CHANGE_COLOR_TRIANGULO_CINZENTO("[FUSION][CHANGE_COLOR][TRIANGULO][CINZENTO]"),

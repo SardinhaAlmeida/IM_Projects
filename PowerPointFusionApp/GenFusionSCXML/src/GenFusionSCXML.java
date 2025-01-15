@@ -10,7 +10,7 @@ import scxmlgen.Fusion.FusionGenerator;
 
 import Modalities.Output;
 import Modalities.Speech;
-import Modalities.Touch;
+import Modalities.Gestures;
 
 /**
  *
@@ -27,21 +27,21 @@ public class GenFusionSCXML {
 
     // Redundância
     // Próximo slide: pode ser ativado por gesto ou comando de voz
-    fg.Redundancy(Speech.NEXT_SLIDE, Touch.NEXT_SLIDE, Output.NEXT_SLIDE);
+    fg.Redundancy(Speech.NEXT_SLIDE, Gestures.NEXT_SLIDE, Output.NEXT_SLIDE);
 
     // Slide anterior: pode ser ativado por gesto ou comando de voz
-    fg.Redundancy(Speech.PREVIOUS_SLIDE, Touch.PREVIOUS_SLIDE, Output.PREVIOUS_SLIDE);
+    fg.Redundancy(Speech.PREVIOUS_SLIDE, Gestures.PREVIOUS_SLIDE, Output.PREVIOUS_SLIDE);
 
     // Complementaridade
     // Saber quanto tempo decorreu: precisa de gesto + comando de voz
-    fg.Complementary(Speech.ELAPSED_TIME, Touch.ELAPSED_TIME, Output.ELAPSED_TIME);
+    fg.Complementary(Speech.ELAPSED_TIME, Gestures.ELAPSED_TIME, Output.ELAPSED_TIME);
 
     // Gesto de ajuda: precisa de gesto + comando de voz
-    fg.Complementary(Speech.HELPER, Touch.HELPER, Output.HELPER);
+    fg.Complementary(Speech.HELPER, Gestures.HELPER, Output.HELPER);
 
     // Ações únicas (Single Speech)
     fg.Single(Speech.GO_TO_SLIDE_TITLE, Output.GO_TO_SLIDE_TITLE);       // Ir para o slide pelo título
-    fg.Single(Speech.GO_TO_SLIDE_NUMBER, Output.GO_TO_SLIDE_NUMBER);     // Ir para o slide pelo número
+    //fg.Single(Speech.GO_TO_SLIDE_NUMBER, Output.GO_TO_SLIDE_NUMBER);     // Ir para o slide pelo número
     fg.Single(Speech.HIGHLIGHT_PHRASE, Output.HIGHLIGHT_PHRASE);         // Destacar uma frase
     fg.Single(Speech.ZOOM_IN, Output.ZOOM_IN);                           // Zoom in
     fg.Single(Speech.ZOOM_OUT, Output.ZOOM_OUT);                         // Zoom out
@@ -52,10 +52,10 @@ public class GenFusionSCXML {
     fg.Single(Speech.STOP_TIMER, Output.STOP_TIMER);                     // Parar temporizador
 
     // Funcionalidades adicionais (somente gestos)
-    fg.Single(Touch.START_PRESENTATION, Output.START_PRESENTATION); // Iniciar apresentação
-    fg.Single(Touch.END_PRESENTATION, Output.END_PRESENTATION);     // Encerrar apresentação
-    fg.Single(Touch.REQUEST_SILENCE, Output.REQUEST_SILENCE);       // Pedir silêncio
-    fg.Single(Touch.QUESTIONS, Output.QUESTIONS);                   // Abrir para questões
+    fg.Single(Gestures.START_PRESENTATION, Output.START_PRESENTATION); // Iniciar apresentação
+    fg.Single(Gestures.END_PRESENTATION, Output.END_PRESENTATION);     // Encerrar apresentação
+    fg.Single(Gestures.REQUEST_SILENCE, Output.REQUEST_SILENCE);       // Pedir silêncio
+    fg.Single(Gestures.QUESTIONS, Output.QUESTIONS);                   // Abrir para questões
   
 
     //fg.Complementary(Speech.CHANGE_COLOR_AZUL, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_AZUL);

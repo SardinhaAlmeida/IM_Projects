@@ -41,7 +41,7 @@ public class GenFusionSCXML {
 
     // Ações únicas (Single Speech)
     fg.Single(Speech.GO_TO_SLIDE_TITLE, Output.GO_TO_SLIDE_TITLE);       // Ir para o slide pelo título
-    //fg.Single(Speech.GO_TO_SLIDE_NUMBER, Output.GO_TO_SLIDE_NUMBER);     // Ir para o slide pelo número
+    fg.Single(Speech.GO_TO_SLIDE_NUMBER, Output.GO_TO_SLIDE_NUMBER);     // Ir para o slide pelo número
     fg.Single(Speech.HIGHLIGHT_PHRASE, Output.HIGHLIGHT_PHRASE);         // Destacar uma frase
     fg.Single(Speech.ZOOM_IN, Output.ZOOM_IN);                           // Zoom in
     fg.Single(Speech.ZOOM_OUT, Output.ZOOM_OUT);                         // Zoom out

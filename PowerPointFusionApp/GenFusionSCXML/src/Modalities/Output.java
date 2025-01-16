@@ -13,21 +13,22 @@ public enum Output implements IOutput{
     HELPER("[FUSION][HELPER]"), // Pedir ajuda
 
     // Ações únicas (Single Gesture e Single Speech)
-    START_PRESENTATION("[FUSION][START_PRESENTATION]"), // Iniciar apresentação
-    END_PRESENTATION("[FUSION][END_PRESENTATION]"), // Terminar apresentação
-    REQUEST_SILENCE("[FUSION][REQUEST_SILENCE]"), // Pedir silêncio à audiência
-    QUESTIONS("[FUSION][QUESTIONS]"), // Abrir para questões
-    GO_TO_SLIDE_TITLE("[FUSION][GO_TO_SLIDE_TITLE]"), // Ir para o slide pelo título
-    HIGHLIGHT_PHRASE("[FUSION][HIGHLIGHT_PHRASE]"), // Destacar uma frase
-    ZOOM_IN("[FUSION][ZOOM_IN]"), // Zoom in
-    ZOOM_OUT("[FUSION][ZOOM_OUT]"), // Zoom out
-    CURRENT_SLIDE("[FUSION][CURRENT_SLIDE]"), // Saber o slide atual
-    SLIDES_LEFT("[FUSION][SLIDES_LEFT]"), // Quantos slides faltam
-    RESTART_PRESENTATION("[FUSION][RESTART_PRESENTATION]"), // Recomeçar apresentação
-    START_TIMER("[FUSION][START_TIMER]"), // Iniciar temporizador
-    STOP_TIMER("[FUSION][STOP_TIMER]"); // Parar temporizador
+    START_PRESENTATION("[GESTURES][START_PRESENTATION]"), // Iniciar apresentação
+    END_PRESENTATION("[GESTURES][END_PRESENTATION]"), // Terminar apresentação
+    REQUEST_SILENCE("[GESTURES][REQUEST_SILENCE]"), // Pedir silêncio à audiência
+    QUESTIONS("[GESTURES][QUESTIONS]"), // Abrir para questões
+    GO_TO_SLIDE_TITLE("[SPEECH][GO_TO_SLIDE_TITLE][TITLE]"), // Ir para o slide pelo título
+    GO_TO_SLIDE_NUMBER("[SPEECH][GO_TO_SLIDE_NUMBER][SLIDE_NUMBER]"), // Ir para o slide pelo número
+    HIGHLIGHT_PHRASE("[SPEECH][HIGHLIGHT_PHRASE][PHRASE]"), // Destacar uma frase
+    ZOOM_IN("[SPEECH][ZOOM_IN]"), // Zoom in
+    ZOOM_OUT("[SPEECH][ZOOM_OUT]"), // Zoom out
+    CURRENT_SLIDE("[SPEECH][CURRENT_SLIDE]"), // Saber o slide atual
+    SLIDES_LEFT("[SPEECH][SLIDES_LEFT]"), // Quantos slides faltam
+    RESTART_PRESENTATION("[SPEECH][RESTART_PRESENTATION]"), // Recomeçar apresentação
+    START_TIMER("[SPEECH][START_TIMER]"), // Iniciar temporizador
+    STOP_TIMER("[SPEECH][STOP_TIMER]"); // Parar temporizador
 
-
+    
     //CHANGE_COLOR_TRIANGULO_AZUL("[FUSION][CHANGE_COLOR][TRIANGULO][AZUL]"),
     //CHANGE_COLOR_TRIANGULO_VERDE("[FUSION][CHANGE_COLOR][TRIANGULO][VERDE]"),
     //CHANGE_COLOR_TRIANGULO_CINZENTO("[FUSION][CHANGE_COLOR][TRIANGULO][CINZENTO]"),

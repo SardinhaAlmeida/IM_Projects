@@ -9,24 +9,24 @@ import scxmlgen.interfaces.IModality;
 public enum Speech implements IModality{  
 
 	// Redundância
-    NEXT_SLIDE("[SPEECH][NEXT_SLIDE]", 2000), // Comando de voz para próximo slide
-    PREVIOUS_SLIDE("[SPEECH][PREVIOUS_SLIDE]", 2000), // Comando de voz para slide anterior
+    NEXT_SLIDE("[SPEECH][NEXT_SLIDE]", 5000), // Comando de voz para próximo slide
+    PREVIOUS_SLIDE("[SPEECH][PREVIOUS_SLIDE]", 5000), // Comando de voz para slide anterior
 
     // Complementaridade
-    ELAPSED_TIME("[SPEECH][ELAPSED_TIME]", 2000), // Saber quanto tempo decorreu
-    HELPER("[SPEECH][HELPER]", 2000), // Comando de voz para pedir ajuda
+    ELAPSED_TIME("[SPEECH][ELAPSED_TIME]", 5000), // Saber quanto tempo decorreu
+    HELPER("[SPEECH][HELPER]", 5000), // Comando de voz para pedir ajuda
 
     // Funcionalidades adicionais
-    GO_TO_SLIDE_TITLE("[SPEECH][GO_TO_SLIDE_TITLE]", 2000), // Ir para o slide pelo título
-    //GO_TO_SLIDE_NUMBER("[SPEECH][GO_TO_SLIDE_NUMBER]", 2000), // Ir para o slide pelo número
-    HIGHLIGHT_PHRASE("[SPEECH][HIGHLIGHT_PHRASE]", 2000), // Destacar uma frase
-    ZOOM_IN("[SPEECH][ZOOM_IN]", 2000), // Zoom in
-    ZOOM_OUT("[SPEECH][ZOOM_OUT]", 2000), // Zoom out
-    CURRENT_SLIDE("[SPEECH][CURRENT_SLIDE]", 2000), // Saber qual é o slide atual
-    SLIDES_LEFT("[SPEECH][SLIDES_LEFT]", 2000), // Quantos slides faltam para acabar
-    RESTART_PRESENTATION("[SPEECH][RESTART_PRESENTATION]", 2000), // Recomeçar apresentação
-    START_TIMER("[SPEECH][START_TIMER]", 2000), // Iniciar temporizador
-    STOP_TIMER("[SPEECH][STOP_TIMER]", 2000); // Parar temporizador
+    GO_TO_SLIDE_TITLE("[SPEECH][GO_TO_SLIDE_TITLE][TITLE]", 5000), // Ir para o slide pelo título
+    GO_TO_SLIDE_NUMBER("[SPEECH][GO_TO_SLIDE_NUMBER][SLIDE_NUMBER]", 5000), // Ir para o slide pelo número
+    HIGHLIGHT_PHRASE("[SPEECH][HIGHLIGHT_PHRASE][PHRASE]", 5000), // Destacar uma frase
+    ZOOM_IN("[SPEECH][ZOOM_IN]", 5000), // Zoom in
+    ZOOM_OUT("[SPEECH][ZOOM_OUT]", 5000), // Zoom out
+    CURRENT_SLIDE("[SPEECH][CURRENT_SLIDE]", 5000), // Saber qual é o slide atual
+    SLIDES_LEFT("[SPEECH][SLIDES_LEFT]", 5000), // Quantos slides faltam para acabar
+    RESTART_PRESENTATION("[SPEECH][RESTART_PRESENTATION]", 5000), // Recomeçar apresentação
+    START_TIMER("[SPEECH][START_TIMER]", 5000), // Iniciar temporizador
+    STOP_TIMER("[SPEECH][STOP_TIMER]", 5000); // Parar temporizador
 
 	//CHANGE_COLOR_AZUL("[SPEECH][CHANGE_COLOR][AZUL]",1500),
 	//CHANGE_COLOR_VERDE("[SPEECH][CHANGE_COLOR][VERDE]",1500),

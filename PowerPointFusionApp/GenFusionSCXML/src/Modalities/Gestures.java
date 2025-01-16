@@ -17,14 +17,14 @@ public enum Gestures implements IModality{
     // SHAPE_QUADRADO("[TOUCH][SHAPE][QUADRADO]",1500),
     // SHAPE_CIRCULO("[TOUCH][SHAPE][CIRCULO]",1500),
 
-    NEXT_SLIDE("[GESTURES][NEXT_SLIDE]", 2000), // Gesto para próximo slide
-    PREVIOUS_SLIDE("[GESTURES][PREVIOUS_SLIDE]", 2000), // Gesto para slide anterior
-    START_PRESENTATION("[GESTURES][START_PRESENTATION]", 2000), // Gesto para iniciar apresentação
-    END_PRESENTATION("[GESTURES][END_PRESENTATION]", 2000), // Gesto para encerrar apresentação
-    ELAPSED_TIME("[GESTURES][ELAPSED_TIME]", 2000), // Gesto para saber tempo decorrido
-    REQUEST_SILENCE("[GESTURES][REQUEST_SILENCE]", 2000), // Gesto para pedir silêncio
-    QUESTIONS("[GESTURES][QUESTIONS]", 2000), // Gesto para abrir para questões
-    HELPER("[GESTURES][HELPER]", 2000), // Gesto de ajuda
+    NEXT_SLIDE("[GESTURES][nextslide]", 5000), // Gesto para próximo slide
+    PREVIOUS_SLIDE("[GESTURES][previous_slide]", 5000), // Gesto para slide anterior
+    START_PRESENTATION("[GESTURES][start]", 5000), // Gesto para iniciar apresentação
+    END_PRESENTATION("[GESTURES][stop]", 5000), // Gesto para encerrar apresentação
+    ELAPSED_TIME("[GESTURES][timer]", 5000), // Gesto para saber tempo decorrido
+    REQUEST_SILENCE("[GESTURES][silence]", 5000), // Gesto para pedir silêncio
+    QUESTIONS("[GESTURES][questions]", 5000), // Gesto para abrir para questões
+    HELPER("[GESTURES][helper]", 5000), // Gesto de ajuda
   
     ;
     

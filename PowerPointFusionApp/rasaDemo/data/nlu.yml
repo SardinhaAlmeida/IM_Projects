@@ -23,48 +23,48 @@ nlu:
  
   - intent: jump_to_slide_by_title
     examples: |
-      - Mostra-me o slide com o título [Resultados](slide_title), por favor
-      - Passando para o slide de [Resultados](slide_title)
-      - Passando para o slide do [Resultados](slide_title)
-      - Passando para o slide da [Resultados](slide_title)
-      - Passando para o slide dos [Resultados](slide_title)
-      - Passando para o slide das [Resultados](slide_title)
+      - Mostra-me o slide com o título [Demonstrações Práticas](slide_title), por favor
+      - Passando para o slide de [Demonstrações Práticas](slide_title)
+      - Passando para o slide do [Demonstrações Práticas](slide_title)
+      - Passando para o slide da [Demonstrações Práticas](slide_title)
+      - Passando para o slide dos [Demonstrações Práticas](slide_title)
+      - Passando para o slide das [Demonstrações Práticas](slide_title)
       - Quero ver o slide [Tecnologias Utilizadas](slide_title), por favor
       - Muda para o slide [Introdução](slide_title)
       - Vai para o slide com o título [Introdução](slide_title)
       - Vai para o slide de título [Introdução](slide_title)
       - Gostava de ver o slide com o título [Índice](slide_title)
-      - Quero saltar para o slide [Resultados](slide_title)
+      - Quero saltar para o slide [Demonstrações Práticas](slide_title)
       - Quero ir para o slide [Introdução](slide_title)
-      - Mostra já o slide [Resultados](slide_title)
+      - Mostra já o slide [Demonstrações Práticas](slide_title)
       - Pode mostrar-me o slide [Índice](slide_title)?
-      - Mostra o slide [Agenda](slide_title), por favor
-      - Salta para o slide [Resultados](slide_title)
+      - Mostra o slide [Funcionalidades Implementadas](slide_title), por favor
+      - Salta para o slide [Demonstrações Práticas](slide_title)
       - Tira-me deste slide e vai para o slide [Introdução](slide_title)
-      - Muda já para o slide [Resultados](slide_title)
+      - Muda já para o slide [Demonstrações Práticas](slide_title)
       - Slide com o título [Introdução](slide_title), por favor
-      - Passa já para o slide [Resultados](slide_title)
+      - Passa já para o slide [Demonstrações Práticas](slide_title)
       - Vai ao slide com o título [Tecnologias Utilizadas](slide_title)
       - Avança para o slide [Tecnologias Utilizadas](slide_title)
-      - Traz-me o slide [Resultados](slide_title)
+      - Traz-me o slide [Demonstrações Práticas](slide_title)
       - Quero o slide chamado [Introdução](slide_title)
       - Dá-me o slide [Índice](slide_title)
       - Apresenta o slide [Resultados](slide_title)
       - Mostra o slide chamado [Introdução](slide_title)
-      - Mostra a parte [Resultados](slide_title)
+      - Mostra a parte [Demonstrações Práticas](slide_title)
       - Quero ver a parte do slide [Introdução](slide_title)
-      - Altera para o slide com o nome [Agenda](slide_title)
-      - Posso ver o slide [Resultados](slide_title)?
+      - Altera para o slide com o nome [Funcionalidades Implementadas](slide_title)
+      - Posso ver o slide [Demonstrações Práticas](slide_title)?
       - Muda imediatamente para o slide [Introdução](slide_title)
-      - Slide [Agenda](slide_title), por favor
-      - Vai até o slide chamado [Resultados](slide_title)
-      - Posso ver o slide de título [Agenda](slide_title)?
+      - Slide [Funcionalidades Implementadas](slide_title), por favor
+      - Vai até o slide chamado [Demonstrações Práticas](slide_title)
+      - Posso ver o slide de título [Funcionalidades Implementadas](slide_title)?
       - Troca para o slide [Introdução](slide_title)
-      - Muda para o slide com o nome [Resultados](slide_title)
+      - Muda para o slide com o nome [Demonstrações Práticas](slide_title)
       - Gostava de ver o slide que tem o título [Agenda](slide_title)
       - Pode avançar para o slide [Resultados](slide_title)?
       - Por favor, passa ao slide com o título [Introdução](slide_title)
-      - Para o slide [Agenda](slide_title), por favor
+      - Para o slide [Funcionalidades Implementadas](slide_title), por favor
       - Troca já para o slide [Resultados](slide_title)
 
 
@@ -88,6 +88,8 @@ nlu:
       - Quero que destaque [Introdução do problema](phrase)
       - Sublinha o texto [Simplificar](phrase)
       - Destaca [Passos futuros para o projeto](phrase)
+      - Destaco é [Simplificar a interação](phrase)
+
 
   - intent: zoom_in
     examples: |
@@ -201,7 +203,7 @@ nlu:
     examples: |
       - Obrigada! Já não preciso.
       - Obrigada! Já sei como usar.
-      - Obrigada! Já não precisa de ajuda.
+      - Obrigada! Já não preciso de ajuda.
 
   - intent: greet
     examples: |

@@ -268,7 +268,7 @@ class Program
             }
 
             if (found)
-                await SendMessage(client, messageMMI($"'{phraseToHighlight}' destacado."));
+                await SendMessage(client, messageMMI($"Destacado."));
             else
                 await SendMessage(client, messageMMI($"Não foi possível destacar o texto '{phraseToHighlight}'."));
         }
@@ -306,7 +306,7 @@ class Program
                 focusShape.Left = (_presentation.PageSetup.SlideWidth - focusShape.Width) / 2;
                 focusShape.Top = (_presentation.PageSetup.SlideHeight - focusShape.Height) / 2;
 
-                await SendMessage(client, messageMMI($"Zoom em: {focusShape.Name}."));
+                await SendMessage(client, messageMMI($"Zoom aplicado."));
 
             }
             else
@@ -339,7 +339,7 @@ class Program
         }
 
 
-        if (intent == "GET_CURRENT_SLIDE")
+        if (intent == "CURRENT_SLIDE")
         {
             if (_presentation?.SlideShowWindow?.View != null)
             {
@@ -382,7 +382,10 @@ class Program
                 _presentation.SlideShowWindow.View.GotoSlide(1);
                 await SendMessage(client, messageMMI("Reiniciada."));
             }
-            await SendMessage(client, messageMMI("Nenhuma apresentação está em execução para reiniciar."));
+            else
+            {
+                await SendMessage(client, messageMMI("Nenhuma apresentação está em execução para reiniciar."));
+            }
         }
 
         if (intent == "START_TIMER")
@@ -412,10 +415,14 @@ class Program
             {
                 _presentation2.SlideShowWindow.View.Exit();
                 _presentation2.Close();
+                _activePresentation = _presentation;
                 _presentation2 = null;
             }
 
-            _activePresentation = _presentation;
+            if (_presentation != null)
+            {
+                _activePresentation = _presentation;
+            }
 
         }
 
@@ -451,7 +458,7 @@ class Program
 
     static async Task HandleGesture(string gesture, ClientWebSocket client)
     {
-        if (gesture == "SILENCE")
+        if (gesture == "REQUEST_SILENCE")
         {
             await SendMessage(client, messageMMI("Pedimos silêncio à audiência, por favor!"));
         }
@@ -586,7 +593,7 @@ class Program
             await SendMessage(client, messageMMI("Olá! Estou aqui para ajudar! Aqui está um powerpoint onde podes ver tudo o que podes fazer para interagir com o sistema!"));
             string projectDir2 = Directory.GetParent(AppDomain.CurrentDomain.BaseDirectory).Parent.Parent.Parent.FullName;
 
-            string ppthelpFilePath = Path.Combine(projectDir2, "IM_Final_Gesture_108796-108067.pptx");
+            string ppthelpFilePath = Path.Combine(projectDir2, "Help_Functionalities.pptx");
 
 
             Console.WriteLine($"Looking for presentation at: {ppthelpFilePath}");

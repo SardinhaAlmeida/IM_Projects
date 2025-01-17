@@ -10,7 +10,7 @@ import scxmlgen.Fusion.FusionGenerator;
 
 import Modalities.Output;
 import Modalities.Speech;
-import Modalities.Touch;
+import Modalities.Gestures;
 
 /**
  *
@@ -24,37 +24,69 @@ public class GenFusionSCXML {
     public static void main(String[] args) throws IOException {
 
     FusionGenerator fg = new FusionGenerator();
+
+    // Redundância
+    // Próximo slide: pode ser ativado por gesto ou comando de voz
+    fg.Redundancy(Speech.NEXT_SLIDE, Gestures.NEXT_SLIDE, Output.NEXT_SLIDE);
+
+    // Slide anterior: pode ser ativado por gesto ou comando de voz
+    fg.Redundancy(Speech.PREVIOUS_SLIDE, Gestures.PREVIOUS_SLIDE, Output.PREVIOUS_SLIDE);
+
+    // Complementaridade
+    // Saber quanto tempo decorreu: precisa de gesto + comando de voz
+    fg.Complementary(Speech.ELAPSED_TIME, Gestures.ELAPSED_TIME, Output.ELAPSED_TIME);
+
+    // Gesto de ajuda: precisa de gesto + comando de voz
+    fg.Complementary(Speech.HELPER, Gestures.HELPER, Output.HELPER);
+
+    // Ações únicas (Single Speech)
+    fg.Single(Speech.GO_TO_SLIDE_TITLE, Output.GO_TO_SLIDE_TITLE);       // Ir para o slide pelo título
+    fg.Single(Speech.GO_TO_SLIDE_NUMBER, Output.GO_TO_SLIDE_NUMBER);     // Ir para o slide pelo número
+    fg.Single(Speech.HIGHLIGHT_PHRASE, Output.HIGHLIGHT_PHRASE);         // Destacar uma frase
+    fg.Single(Speech.ZOOM_IN, Output.ZOOM_IN);                           // Zoom in
+    fg.Single(Speech.ZOOM_OUT, Output.ZOOM_OUT);                         // Zoom out
+    fg.Single(Speech.CURRENT_SLIDE, Output.CURRENT_SLIDE);               // Slide atual
+    fg.Single(Speech.SLIDES_LEFT, Output.SLIDES_LEFT);                   // Slides restantes
+    fg.Single(Speech.RESTART_PRESENTATION, Output.RESTART_PRESENTATION); // Recomeçar apresentação
+    fg.Single(Speech.START_TIMER, Output.START_TIMER);                   // Iniciar temporizador
+    fg.Single(Speech.STOP_TIMER, Output.STOP_TIMER);                     // Parar temporizador
+
+    // Funcionalidades adicionais (somente gestos)
+    fg.Single(Gestures.START_PRESENTATION, Output.START_PRESENTATION); // Iniciar apresentação
+    fg.Single(Gestures.END_PRESENTATION, Output.END_PRESENTATION);     // Encerrar apresentação
+    fg.Single(Gestures.REQUEST_SILENCE, Output.REQUEST_SILENCE);       // Pedir silêncio
+    fg.Single(Gestures.QUESTIONS, Output.QUESTIONS);                   // Abrir para questões
   
 
-    fg.Complementary(Speech.CHANGE_COLOR_AZUL, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_AZUL);
-    fg.Complementary(Speech.CHANGE_COLOR_VERDE, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_VERDE);
-    fg.Complementary(Speech.CHANGE_COLOR_CINZENTO, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_CINZENTO);
-    fg.Complementary(Speech.CHANGE_COLOR_VERMELHO, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_VERMELHO);
-    fg.Complementary(Speech.CHANGE_COLOR_BRANCO, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_BRANCO);
-    fg.Complementary(Speech.CHANGE_COLOR_ROSA, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_ROSA);
-    fg.Complementary(Speech.CHANGE_COLOR_AMARELO, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_AMARELO);
-    fg.Complementary(Speech.CHANGE_COLOR_PRETO, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_PRETO);
-    fg.Complementary(Speech.CHANGE_COLOR_LARANJA, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_LARANJA);
+    //fg.Complementary(Speech.CHANGE_COLOR_AZUL, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_AZUL);
+    //fg.Complementary(Speech.CHANGE_COLOR_VERDE, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_VERDE);
+    //fg.Complementary(Speech.CHANGE_COLOR_CINZENTO, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_CINZENTO);
+    //fg.Complementary(Speech.CHANGE_COLOR_VERMELHO, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_VERMELHO);
+    //fg.Complementary(Speech.CHANGE_COLOR_BRANCO, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_BRANCO);
+    //fg.Complementary(Speech.CHANGE_COLOR_ROSA, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_ROSA);
+    //fg.Complementary(Speech.CHANGE_COLOR_AMARELO, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_AMARELO);
+    //fg.Complementary(Speech.CHANGE_COLOR_PRETO, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_PRETO);
+    //fg.Complementary(Speech.CHANGE_COLOR_LARANJA, Touch.SHAPE_TRIANGULO, Output.CHANGE_COLOR_TRIANGULO_LARANJA);
 
-    fg.Complementary(Speech.CHANGE_COLOR_AZUL, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_AZUL);
-    fg.Complementary(Speech.CHANGE_COLOR_VERDE, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_VERDE);
-    fg.Complementary(Speech.CHANGE_COLOR_CINZENTO, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_CINZENTO);
-    fg.Complementary(Speech.CHANGE_COLOR_VERMELHO, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_VERMELHO);
-    fg.Complementary(Speech.CHANGE_COLOR_BRANCO, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_BRANCO);
-    fg.Complementary(Speech.CHANGE_COLOR_ROSA, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_ROSA);
-    fg.Complementary(Speech.CHANGE_COLOR_AMARELO, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_AMARELO);
-    fg.Complementary(Speech.CHANGE_COLOR_PRETO, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_PRETO);
-    fg.Complementary(Speech.CHANGE_COLOR_LARANJA, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_LARANJA);
+    //fg.Complementary(Speech.CHANGE_COLOR_AZUL, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_AZUL);
+    //fg.Complementary(Speech.CHANGE_COLOR_VERDE, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_VERDE);
+    //fg.Complementary(Speech.CHANGE_COLOR_CINZENTO, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_CINZENTO);
+    //fg.Complementary(Speech.CHANGE_COLOR_VERMELHO, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_VERMELHO);
+    //fg.Complementary(Speech.CHANGE_COLOR_BRANCO, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_BRANCO);
+    //fg.Complementary(Speech.CHANGE_COLOR_ROSA, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_ROSA);
+    //fg.Complementary(Speech.CHANGE_COLOR_AMARELO, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_AMARELO);
+    //fg.Complementary(Speech.CHANGE_COLOR_PRETO, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_PRETO);
+    //fg.Complementary(Speech.CHANGE_COLOR_LARANJA, Touch.SHAPE_QUADRADO, Output.CHANGE_COLOR_QUADRADO_LARANJA);
 
-    fg.Complementary(Speech.CHANGE_COLOR_AZUL, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_AZUL);
-    fg.Complementary(Speech.CHANGE_COLOR_VERDE, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_VERDE);
-    fg.Complementary(Speech.CHANGE_COLOR_CINZENTO, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_CINZENTO);
-    fg.Complementary(Speech.CHANGE_COLOR_VERMELHO, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_VERMELHO);
-    fg.Complementary(Speech.CHANGE_COLOR_BRANCO, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_BRANCO);
-    fg.Complementary(Speech.CHANGE_COLOR_ROSA, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_ROSA);
-    fg.Complementary(Speech.CHANGE_COLOR_AMARELO, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_AMARELO);
-    fg.Complementary(Speech.CHANGE_COLOR_PRETO, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_PRETO);
-    fg.Complementary(Speech.CHANGE_COLOR_LARANJA, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_LARANJA);
+    //fg.Complementary(Speech.CHANGE_COLOR_AZUL, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_AZUL);
+    //fg.Complementary(Speech.CHANGE_COLOR_VERDE, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_VERDE);
+    //fg.Complementary(Speech.CHANGE_COLOR_CINZENTO, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_CINZENTO);
+    //fg.Complementary(Speech.CHANGE_COLOR_VERMELHO, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_VERMELHO);
+    //fg.Complementary(Speech.CHANGE_COLOR_BRANCO, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_BRANCO);
+    //fg.Complementary(Speech.CHANGE_COLOR_ROSA, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_ROSA);
+    //fg.Complementary(Speech.CHANGE_COLOR_AMARELO, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_AMARELO);
+    //fg.Complementary(Speech.CHANGE_COLOR_PRETO, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_PRETO);
+    //fg.Complementary(Speech.CHANGE_COLOR_LARANJA, Touch.SHAPE_CIRCULO, Output.CHANGE_COLOR_CIRCULO_LARANJA);
 
     
 
@@ -138,6 +170,7 @@ public class GenFusionSCXML {
     
    // fg.Redundancy(Touch.GO_BACK, Speech.ACTION_GENERICENTITY_BACK, Output.GO_BACK);
     fg.Build("fusion_novo.scxml");
+    System.out.println("Ficheiro SCXML gerado com sucesso!");
         
     }
     

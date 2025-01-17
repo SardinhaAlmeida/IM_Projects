@@ -474,14 +474,6 @@
                 var message;
 
                 switch (data.intent.name) {
-                    case ('next_slide'):
-                        message = { 'intent': 'next_slide' };
-                        break;
-
-                    case ('previous_slide'):
-                        message = { 'intent': 'previous_slide' };
-                        break;
-
                     case ('jump_to_slide_by_number'):
 
                         var slide_number = '';
@@ -515,9 +507,6 @@
                         message = { 'intent': 'highlight_phrase', 'phrase': phrase };
                         break;
 
-                    case ('show_elapsed_time'):
-                        message = { 'intent': 'show_elapsed_time' };
-                        break;
 
                     case ('zoom_in'):
                         message = { 'intent': 'zoom_in' };
@@ -547,9 +536,6 @@
                         message = { 'intent': 'stop_timer' };
                         break;
 
-                    case ('helper'):
-                        message = { 'intent': 'helper' };
-                        break;   
 
                     case ('greet') :
                         message = { 'intent': 'greet' };
